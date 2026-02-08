@@ -2,9 +2,12 @@ package main
 
 import (
 	"fmt"
+	"time"
 )
 
 func main() {
+	menu()
+
 	// var number1, number2 int
 	// var op string
 	// fmt.Print("Enter first number: ")
@@ -20,11 +23,32 @@ func main() {
 	// year := time.Now().Year()
 	// printLeapYear(year)
 
-	n := 10
-	fmt.Printf("Fibonacci of %d is %d\n", n, fibonacci(n))
+	// n := 10
+	// fmt.Printf("Fibonacci of %d is %d\n", n, fibonacci(n))
+	// countdown(5)
+
+	// a, b := "hello", "world"
+	// fmt.Printf("Before swap: a = %s, b = %s\n", a, b)
+	// a, b = swap(a, b)
+	// fmt.Printf("After swap: a = %s, b = %s\n", a, b)
 }
 
-// fibonacci function
+// return multiple values function
+func swap(a, b string) (string, string) {
+	return b, a
+}
+
+// recursive function
+func countdown(n int) {
+	if n <= 0 {
+		fmt.Println("Countdown finished!")
+		return
+	}
+	fmt.Println(n)
+	time.Sleep(200 * time.Millisecond)
+	countdown(n - 1)
+}
+
 func fibonacci(n int) int {
 	if n <= 0 {
 		return 0
