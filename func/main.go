@@ -19,6 +19,22 @@ func main() {
 
 	// year := time.Now().Year()
 	// printLeapYear(year)
+
+	n := 10
+	fmt.Printf("Fibonacci of %d is %d\n", n, fibonacci(n))
+}
+
+// fibonacci function
+func fibonacci(n int) int {
+	if n <= 0 {
+		return 0
+	}
+
+	if n == 1 {
+		return 1
+	}
+
+	return fibonacci(n-1) + fibonacci(n-2)
 }
 
 // void function
