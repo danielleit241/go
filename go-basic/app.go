@@ -1,10 +1,7 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
-	"strconv"
 )
 
 var address string = "123 Main St"
@@ -13,6 +10,14 @@ var (
 	courseId   int
 	courseName string = "Go Programming"
 )
+
+const PI = 3.14
+const SPEEDOFLIGHT = 900 // km/h
+const (
+	AppName    = "GoBasicApp"
+	AppVersion = "1.0.0"
+)
+const E = 3.71
 
 // course := "Go Programming" // shorthand declaration at package level is not allowed
 
@@ -28,32 +33,43 @@ func main() {
 	// fmt.Println("Course ID:", courseId)
 	// fmt.Println("Course Name:", courseName)
 
-	var fullName string = "John Doe"
-	fmt.Println("Full Name variable example:", fullName)
+	// var fullName string = "John Doe"
+	// fmt.Println("Full Name variable example:", fullName)
 
-	fullName = "Jane Smith"
-	fmt.Println("Updated Full Name variable example:", fullName)
+	// fullName = "Jane Smith"
+	// fmt.Println("Updated Full Name variable example:", fullName)
 
-	fmt.Print("Enter your full name: ")
-	// fmt.Scan(&fullName) // Note: This will only capture input until the first space
+	// fmt.Print("Enter your full name: ")
+	// // fmt.Scan(&fullName) // Note: This will only capture input until the first space
+	// // fmt.Println("Scanned Full Name variable example:", fullName)
+	// scanner := bufio.NewScanner(os.Stdin)
+	// if scanner.Scan() {
+	// 	fullName = scanner.Text()
+	// }
 	// fmt.Println("Scanned Full Name variable example:", fullName)
-	scanner := bufio.NewScanner(os.Stdin)
-	if scanner.Scan() {
-		fullName = scanner.Text()
-	}
-	fmt.Println("Scanned Full Name variable example:", fullName)
 
-	var age int
-	fmt.Print("Enter your age: ")
-	if scanner.Scan() {
-		ageInput := scanner.Text()
-		var err error
-		age, err = strconv.Atoi(ageInput)
-		if err != nil {
-			fmt.Println("Vui lòng nhập số hợp lệ!")
-		}
-	}
-	fmt.Println("Scanned Age variable example:", age)
+	// var age int
+	// fmt.Print("Enter your age: ")
+	// if scanner.Scan() {
+	// 	ageInput := scanner.Text()
+	// 	var err error
+	// 	age, err = strconv.Atoi(ageInput)
+	// 	if err != nil {
+	// 		fmt.Println("Vui lòng nhập số hợp lệ!")
+	// 	}
+	// }
+	// fmt.Println("Scanned Age variable example:", age)
+
+	fmt.Println("Constant PI value:", PI)
+	// PI = 3.14159 // This will cause a compile-time error
+
+	const E = 2.71 // local constant
+	fmt.Println("Constant E value:", E)
+	// -> The value of the constant E inside main function is 2.71
+	// -> The value of the package-level constant E is 3.71 (though we don't use it here)
+
+	fmt.Println("App Name constant value:", AppName)
+	fmt.Println("App Version constant value:", AppVersion)
 }
 
 func variableExamples() {
