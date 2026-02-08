@@ -3,8 +3,8 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Println("Conditional Statements in Go")
-	ifStatement()
+	// fmt.Println("Conditional Statements in Go")
+	// ifStatement()
 
 	fmt.Println("\nSwitch Statement Example")
 	switchStatement()
@@ -16,21 +16,20 @@ func switchStatement() {
 	fmt.Scanln(&day)
 	switch day {
 	case 1:
-		println("Monday")
+		fmt.Println("Monday")
+		// No break needed; Go automatically breaks after each case
 	case 2:
-		println("Tuesday")
+		fmt.Println("Tuesday")
 	case 3:
-		println("Wednesday")
+		fmt.Println("Wednesday")
 	case 4:
-		println("Thursday")
+		fmt.Println("Thursday")
 	case 5:
-		println("Friday")
-	case 6:
-		println("Saturday")
-	case 7:
-		println("Sunday")
+		fmt.Println("Friday")
+	case 6, 7: // Multiple cases can be handled together
+		fmt.Println("Weekend")
 	default:
-		println("Invalid day number!")
+		fmt.Println("Invalid day number!")
 	}
 }
 
@@ -39,23 +38,23 @@ func ifStatement() {
 	fmt.Print("Enter your age: ")
 	fmt.Scanln(&allowedAge)
 	if allowedAge >= 18 {
-		println("Access granted - you are old enough.")
+		fmt.Println("Access granted - you are old enough.")
 	} else {
-		println("Access denied - you are not old enough.")
+		fmt.Println("Access denied - you are not old enough.")
 	}
 
 	var myGrade int
 	fmt.Print("Enter your grade: ")
 	fmt.Scanln(&myGrade)
 	if myGrade >= 9 && myGrade <= 10 {
-		println("You received an A.")
+		fmt.Println("You received an A.")
 	} else if myGrade >= 8 && myGrade < 9 {
-		println("You received a B.")
+		fmt.Println("You received a B.")
 	} else if myGrade >= 6 && myGrade < 7 {
-		println("You received a C.")
+		fmt.Println("You received a C.")
 	} else if myGrade >= 5 && myGrade < 6 {
-		println("You received a D.")
+		fmt.Println("You received a D.")
 	} else {
-		println("You received an F.")
+		fmt.Println("You received an F.")
 	}
 }
