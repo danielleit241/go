@@ -1,7 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+	"strconv"
 )
 
 var address string = "123 Main St"
@@ -20,10 +23,37 @@ func main() {
 	// fmt.Println("Address variable example:", address)
 	// variableExamples()
 
-	courseId = 101
-	courseName = "Advanced Go Programming"
-	fmt.Println("Course ID:", courseId)
-	fmt.Println("Course Name:", courseName)
+	// courseId = 101
+	// courseName = "Advanced Go Programming"
+	// fmt.Println("Course ID:", courseId)
+	// fmt.Println("Course Name:", courseName)
+
+	var fullName string = "John Doe"
+	fmt.Println("Full Name variable example:", fullName)
+
+	fullName = "Jane Smith"
+	fmt.Println("Updated Full Name variable example:", fullName)
+
+	fmt.Print("Enter your full name: ")
+	// fmt.Scan(&fullName) // Note: This will only capture input until the first space
+	// fmt.Println("Scanned Full Name variable example:", fullName)
+	scanner := bufio.NewScanner(os.Stdin)
+	if scanner.Scan() {
+		fullName = scanner.Text()
+	}
+	fmt.Println("Scanned Full Name variable example:", fullName)
+
+	var age int
+	fmt.Print("Enter your age: ")
+	if scanner.Scan() {
+		ageInput := scanner.Text()
+		var err error
+		age, err = strconv.Atoi(ageInput)
+		if err != nil {
+			fmt.Println("Vui lòng nhập số hợp lệ!")
+		}
+	}
+	fmt.Println("Scanned Age variable example:", age)
 }
 
 func variableExamples() {
