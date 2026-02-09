@@ -28,10 +28,10 @@ func main() {
 	// printStudentDetails(johnDoe)
 
 	student1 := createStudent(101, "Bob", 21, true)
-	printStudentDetails(student1)
+	printStudentDetailsPointer(&student1)
 	fmt.Println("Updating student name...")
 	updateStudentName(&student1, "Robert")
-	printStudentDetails(student1)
+	printStudentDetailsPointer(&student1)
 }
 
 func updateStudentName(s *Student, newName string) {
@@ -45,6 +45,13 @@ func createStudent(id int, name string, age int, enrolled bool) Student {
 		age:        age,
 		isEnrolled: enrolled,
 	}
+}
+
+func printStudentDetailsPointer(s *Student) {
+	fmt.Printf("ID: %d\n", s.studentId)
+	fmt.Printf("Name: %s\n", s.name)
+	fmt.Printf("Age: %d\n", s.age)
+	fmt.Printf("Enrolled: %t\n", s.isEnrolled)
 }
 
 func printStudentDetails(s Student) {
