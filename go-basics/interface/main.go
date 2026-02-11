@@ -9,8 +9,16 @@ import (
 )
 
 func main() {
-	dog := dog.New("Buddy")
-	cat := cat.New("Whiskers")
+	dog, err := dog.New("Buddy")
+	if err != nil {
+		fmt.Println("Error creating dog:", err)
+		return
+	}
+	cat, err := cat.New("Whiskers")
+	if err != nil {
+		fmt.Println("Error creating cat:", err)
+		return
+	}
 
 	fmt.Print("Dog speak: ")
 	MakeSound(dog)
