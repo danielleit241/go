@@ -10,10 +10,10 @@ type Cat struct {
 }
 
 func New(name string) (*Cat, error) {
+	name = strings.TrimSpace(name)
 	if err := validateName(name); err != nil {
 		return nil, err
 	}
-	name = strings.TrimSpace(name)
 	return &Cat{Name: name}, nil
 }
 
@@ -32,4 +32,16 @@ func validateName(name string) error {
 
 func (c *Cat) Speak() string {
 	return "Meow! I'm " + c.Name
+}
+
+func (c *Cat) Eat() string {
+	return c.Name + " is eating cat food."
+}
+
+func (c *Cat) Play() string {
+	return c.Name + " is playing with a ball of yarn!"
+}
+
+func (c *Cat) Run() string {
+	return c.Name + " is running swiftly!"
 }

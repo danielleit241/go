@@ -10,10 +10,10 @@ type Dog struct { //Name exported
 }
 
 func New(name string) (*Dog, error) {
+	name = strings.TrimSpace(name)
 	if err := validateName(name); err != nil {
 		return nil, err
 	}
-	name = strings.TrimSpace(name)
 	return &Dog{Name: name}, nil
 }
 
@@ -32,4 +32,20 @@ func validateName(name string) error {
 
 func (d *Dog) Speak() string {
 	return "Woof! I'm " + d.Name
+}
+
+func (d *Dog) Eat() string {
+	return d.Name + " is eating dog food."
+}
+
+func (d *Dog) Extra() string {
+	return d.Name + " loves to play fetch!"
+}
+
+func (d *Dog) Play() string {
+	return d.Name + " is playing happily!"
+}
+
+func (d *Dog) Run() string {
+	return d.Name + " is running fast!"
 }
