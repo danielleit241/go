@@ -35,6 +35,10 @@ func main() {
 	}
 	// fmt.Print(mouse.Eat() + "\n") // Error handled, interfaces.AnimalActions has no field or method Eat
 	fmt.Print(mouse.Run() + "\n") // Directly call Run method
+
+	fmt.Println("Empty interface: ")
+	PrintValueV1("The dog name is: " + dog.Name + "\n")
+	PrintValueV2("The dog name is: " + dog.Name)
 }
 
 func MakeSound(a interfaces.Animal) {
@@ -51,4 +55,14 @@ func MakeSoundPlus(a interfaces.AnimalPlus) {
 	fmt.Println(a.Speak() + "\n")
 	fmt.Println(a.Eat() + "\n")
 	fmt.Println(a.Extra() + "\n")
+}
+
+// PrintName demonstrates type assertion with an empty interface
+func PrintValueV1(value interface{}) {
+	fmt.Print(value)
+}
+
+// PrintNameV2 demonstrates type assertion with an empty interface using 'any' keyword = 'interface{}'
+func PrintValueV2(value any) {
+	fmt.Print(value)
 }
