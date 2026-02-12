@@ -39,6 +39,10 @@ func main() {
 	fmt.Println("Empty interface: ")
 	PrintValueV1("The dog name is: " + dog.Name + "\n")
 	PrintValueV2("The dog name is: " + dog.Name)
+	PrintValues(42)
+	PrintValues(true)
+	PrintStringValue("Hello, World!")
+	// PrintStringValue(100) // Not a string value
 }
 
 func MakeSound(a interfaces.Animal) {
@@ -65,4 +69,29 @@ func PrintValueV1(value interface{}) {
 // PrintNameV2 demonstrates type assertion with an empty interface using 'any' keyword = 'interface{}'
 func PrintValueV2(value any) {
 	fmt.Print(value)
+}
+
+// any = interface{} = any type
+// Because any can hold any type, we need to use `type assertion` or type switch to get the underlying value and type.
+
+func PrintValues(value any) {
+	switch v := value.(type) {
+	case string:
+		fmt.Println("String value:", v)
+	case int:
+		fmt.Println("Integer value:", v)
+	case bool:
+		fmt.Println("Boolean value:", v)
+	default:
+		fmt.Println("Unknown type")
+	}
+}
+
+func PrintStringValue(value any) {
+	strValue, ok := value.(string)
+	if !ok {
+		fmt.Println("Not a string value")
+		return
+	}
+	fmt.Println("String value:", strValue)
 }
