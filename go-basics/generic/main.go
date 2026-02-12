@@ -1,9 +1,30 @@
+// Generic in Go is primarily implemented through the use of type parameters, which allow you to write functions, types, and methods that can operate on different data types without sacrificing type safety. Generics were introduced in Go 1.18.
+
 package main
 
 import (
 	"cmp"
 	"fmt"
+
+	"golang.org/x/exp/constraints"
 )
+
+type Number interface {
+	constraints.Integer | constraints.Float
+}
+
+type Rectangle[T Number] struct {
+	Width  T
+	Height T
+}
+
+func (r Rectangle[T]) Area() T {
+	return r.Width * r.Height
+}
+
+func (r Rectangle[T]) Perimeter() T {
+	return 2 * (r.Width + r.Height)
+}
 
 type Box[T any] struct {
 	Content     T
@@ -13,8 +34,6 @@ type Box[T any] struct {
 func New[T any](content T, description T) *Box[T] {
 	return &Box[T]{Content: content, Description: description}
 }
-
-// Generic in Go is primarily implemented through the use of type parameters, which allow you to write functions, types, and methods that can operate on different data types without sacrificing type safety. Generics were introduced in Go 1.18.
 
 func main() {
 	// PrintValue("Hello, World!")
@@ -34,13 +53,23 @@ func main() {
 	// maxStr := Max("apple", "banana")
 	// fmt.Println("Max of apple and banana is:", maxStr)
 
-	strBox := New("Learning Generics in Go!", "A string box")
-	fmt.Println("Box content:", strBox.Content)
-	fmt.Println("Box description:", strBox.Description)
+	// strBox := New("Learning Generics in Go!", "A string box")
+	// fmt.Println("Box content:", strBox.Content)
+	// fmt.Println("Box description:", strBox.Description)
 
-	intBox := New(100, 200)
-	fmt.Println("Box content:", intBox.Content)
-	fmt.Println("Box description:", intBox.Description)
+	// intBox := New(100, 200)
+	// fmt.Println("Box content:", intBox.Content)
+	// fmt.Println("Box description:", intBox.Description)
+
+	rectInt := Rectangle[int]{Width: 5, Height: 10}
+	fmt.Printf("Area of integer rectangle: %d\n", rectInt.Area())
+	fmt.Printf("Perimeter of integer rectangle: %d\n", rectInt.Perimeter())
+
+	rectFloat := Rectangle[float64]{Width: 5.5, Height: 10.2}
+	fmt.Printf("Area of float rectangle: %.2f\n", rectFloat.Area())
+	fmt.Printf("Perimeter of float rectangle: %.2f\n", rectFloat.Perimeter())
+
+	// rectStr := Rectangle[string]{Width: "5", Height: "10"} // This will not compile because string does not satisfy the Number constraint
 }
 
 func PrintValue[T any](value T) {
