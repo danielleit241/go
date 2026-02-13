@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"reflect"
+	"slices"
 )
 
 func SliceExample() {
@@ -15,6 +16,8 @@ func SliceExample() {
 	AppendSlice()
 
 	SubSlice()
+
+	SlicesPackage()
 }
 
 func IntroductionSlice() {
@@ -135,4 +138,41 @@ func SubSlice() {
 	fmt.Println("After modifying SubSlice1:")
 	fmt.Println("Original Slice:", numbers, "length:", len(numbers), "capacity:", cap(numbers))
 	fmt.Println("SubSlice1:", subSliceNumbers1, "length:", len(subSliceNumbers1), "capacity:", cap(subSliceNumbers1))
+}
+
+func SlicesPackage() {
+	fmt.Println("Slices Package Examples")
+
+	slice := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+	fmt.Println("Original slice:", slice)
+
+	copied := slices.Clone(slice)
+	fmt.Println("Copied slice:", copied)
+
+	compareSlice := slices.Equal(slice, copied)
+	fmt.Println("Are slices equal?", compareSlice)
+
+	findPos := slices.Index(slice, 11) // returns the index of the first occurrence of 11, or -1 if not found
+	fmt.Println("Position of 11 in slice:", findPos)
+
+	slices.Reverse(slice)
+	fmt.Println("Reversed slice:", slice)
+
+	itemIsExist := slices.Contains(slice, 5)
+	fmt.Println("Does slice contain 5?", itemIsExist)
+
+	sortedSlice := []int{3, 1, 4, 5, 2}
+	slices.Sort(sortedSlice)
+	fmt.Println("Sorted slice:", sortedSlice)
+
+	insertedSlice := slices.Insert(sortedSlice, 2, 10)
+	fmt.Println("Slice after inserting 10 at index 2:", insertedSlice)
+
+	removedSlice := slices.Delete(insertedSlice, 4, 6) // removes elements from index 4 to 5
+	fmt.Println("Slice after deleting elements from index 4 to 5:", removedSlice)
+
+	max := slices.Max(removedSlice)
+	min := slices.Min(removedSlice)
+	fmt.Println("Max value in slice:", max)
+	fmt.Println("Min value in slice:", min)
 }
