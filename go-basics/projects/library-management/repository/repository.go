@@ -9,6 +9,7 @@ var (
 	ErrAlreadyExists        = fmt.Errorf("entity already exists")
 	ErrBookAlreadyAvailable = fmt.Errorf("book is already available")
 	ErrBookNotAvailable     = fmt.Errorf("book is not available")
+	ErrBookAlreadyReturned  = fmt.Errorf("book has already been returned")
 )
 
 type BaseEntity interface {

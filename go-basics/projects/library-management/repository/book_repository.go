@@ -5,7 +5,6 @@ import "example.com/go/entity"
 type BookRepository interface {
 	Repository[entity.Book]
 	FindBookByTitle(title string) ([]entity.Book, error)
-	ReturnBook(id string) error
 	BorrowBook(id string) error
 }
 
@@ -27,18 +26,6 @@ func (r *inMemoryBookRepository) FindBookByTitle(title string) ([]entity.Book, e
 		}
 	}
 	return results, nil
-}
-
-func (r *inMemoryBookRepository) ReturnBook(id string) error {
-	book, err := r.GetByID(id)
-	if err != nil {
-		return err
-	}
-	if book.IsAvailable {
-		return ErrBookAlreadyAvailable
-	}
-	book.IsAvailable = true
-	return r.Update(book)
 }
 
 func (r *inMemoryBookRepository) BorrowBook(id string) error {

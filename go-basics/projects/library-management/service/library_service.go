@@ -18,7 +18,7 @@ type LibraryWriter interface {
 	AddBook(title, author string) error
 	RegisterUser(name, email string) error
 	BorrowBook(bookID, userID string) error
-	ReturnBook(bookID, userID string) error
+	ReturnBook(transactionID string) error
 }
 
 type LibraryService interface {
@@ -76,12 +76,7 @@ func (s *libraryService) BorrowBook(bookID, userID string) error {
 	transaction := entity.NewTransaction(bookID, userID, borrowDate, "")
 	return s.TransactionRepo.Create(transaction)
 }
-func (s *libraryService) ReturnBook(bookID, userID string) error {
-	err := s.BookRepo.ReturnBook(bookID)
-	if err != nil {
-		return err
-	}
-	returnDate := time.Now().Format("2006-01-02")
-	transaction := entity.NewTransaction(bookID, userID, "", returnDate)
-	return s.TransactionRepo.Create(transaction)
+
+func (s *libraryService) ReturnBook(transactionID string) error {
+	return s.TransactionRepo.ReturnBook(transactionID)
 }
