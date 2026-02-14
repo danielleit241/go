@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"runtime"
 	"sync"
 	"time"
 )
@@ -223,8 +224,35 @@ func main() {
 	// 	}
 	// }
 
+	// fmt.Println("--------------------------------")
+	// raceCondition()
+
 	fmt.Println("--------------------------------")
-	raceCondition()
+
+	numberCpus := runtime.NumCPU()
+	fmt.Println("Number of CPUs:", numberCpus)
+
+	// By default, Go will use all available CPUs for goroutines. If you want to limit the number of CPUs that can be used, you can set it using runtime.GOMAXPROCS. However, in most cases, it's best to let Go manage this automatically based on the workload and system resources.
+
+	runtime.GOMAXPROCS(numberCpus) // Set the maximum number of CPUs that can be executing simultaneously to the number of available CPUs
+
+	start := time.Now()
+	var wg sync.WaitGroup
+
+	for range 10 {
+		wg.Add(1)
+		go heavyTask(&wg)
+	}
+	wg.Wait()
+	fmt.Println("Total time:", time.Since(start))
+}
+
+func heavyTask(wg *sync.WaitGroup) {
+	defer wg.Done()
+	sum := 0
+	for i := 0; i < 100e8; i++ {
+		sum += i
+	}
 }
 
 func raceCondition() {
