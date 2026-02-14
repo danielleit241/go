@@ -67,6 +67,15 @@ func bufferedChannel() {
 	}
 }
 
+func taskChannel(taskNumber int, wg *sync.WaitGroup, ch chan<- string) {
+	defer wg.Done() // Defer ensures that Done is called when the function exits
+
+	fmt.Println("Task", taskNumber, "is running")
+	time.Sleep(1 * time.Second)
+	ch <- fmt.Sprintf("Task %d is sending result to channel", taskNumber)
+	ch <- fmt.Sprintf("Task %d completed", taskNumber)
+}
+
 func main() {
 	//demoDefer()
 
@@ -85,7 +94,35 @@ func main() {
 
 	// go unbufferedChannel()
 
-	go bufferedChannel()
+	// go bufferedChannel()
 
-	time.Sleep(1 * time.Second) // Sleep to allow goroutines to finish before main exits
+	//time.Sleep(1 * time.Second) // Sleep to allow goroutines to finish before main exits
+
+	start := time.Now()
+
+	var wg sync.WaitGroup
+
+	// ch := make(chan string, 8) // buffered channel to hold results from goroutines
+	ch := make(chan string) // unbuffered channel to hold results from goroutines
+
+	for i := range 4 {
+		wg.Add(1)
+		go taskChannel(i+1, &wg, ch)
+	}
+
+	go func() {
+		// Wait for all goroutines to finish and then close the channel
+		wg.Wait()
+		close(ch)
+	}()
+
+	// for i := 0; i < 4; i++ {
+	// 	fmt.Println(<-ch)
+	// }
+
+	for result := range ch {
+		fmt.Println(result)
+	}
+
+	fmt.Println("Total time:", time.Since(start))
 }
