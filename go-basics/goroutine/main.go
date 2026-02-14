@@ -21,6 +21,8 @@ func demoDefer() {
 }
 
 func unbufferedChannel() {
+	// Unbuffered channel: A channel that does not have a buffer and requires both sender and receiver to be ready for communication to occur.
+
 	ch := make(chan int)
 
 	go func() {
@@ -47,6 +49,24 @@ func unbufferedChannel() {
 	}
 }
 
+func bufferedChannel() {
+	// Buffered channel: A channel that has a buffer and allows sending and receiving of values without blocking until the buffer is full or empty.
+
+	ch := make(chan int, 3) // Create a buffered channel with a capacity of 3
+
+	ch <- 1 // Send value to channel (non-blocking)
+	ch <- 2
+	ch <- 3
+
+	close(ch)
+
+	fmt.Println("Finished sending values to channel")
+
+	for value := range ch { // Using when channel is closed, it will exit the loop
+		fmt.Println("Received value:", value)
+	}
+}
+
 func main() {
 	//demoDefer()
 
@@ -63,7 +83,9 @@ func main() {
 
 	// fmt.Print("Total time: ", time.Since((start)))
 
-	go unbufferedChannel()
+	// go unbufferedChannel()
+
+	go bufferedChannel()
 
 	time.Sleep(1 * time.Second) // Sleep to allow goroutines to finish before main exits
 }
