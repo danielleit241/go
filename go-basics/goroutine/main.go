@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"sync"
 	"time"
@@ -76,8 +77,54 @@ func taskChannel(taskNumber int, wg *sync.WaitGroup, ch chan<- string) {
 	ch <- fmt.Sprintf("Task %d completed", taskNumber)
 }
 
+func selectChannel() {
+	// Select statement: A control structure that allows a goroutine to wait on multiple communication operations (channels) simultaneously and proceed with the one that is ready first.
+
+	ch1 := make(chan string)
+	ch2 := make(chan string)
+
+	go func() {
+		time.Sleep(3 * time.Second)
+		ch1 <- "Message from channel 1"
+	}()
+
+	go func() {
+		time.Sleep(1 * time.Second)
+		ch2 <- "Message from channel 2"
+	}()
+
+	// fmt.Println(<-ch1) // This will block until a message is received from ch1
+	// fmt.Println(<-ch2)
+
+	for i := 0; i < 2; i++ {
+		select {
+		case msg1 := <-ch1:
+			fmt.Println("Received:", msg1)
+		case msg2 := <-ch2:
+			fmt.Println("Received:", msg2)
+		}
+	}
+}
+
+func contextExample(ctx context.Context, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	for {
+		select {
+		case <-ctx.Done():
+			fmt.Println("Context canceled, exiting goroutine")
+			return
+		default:
+			fmt.Println("Running:", ctx.Value("priority"))
+			time.Sleep(500 * time.Millisecond)
+		}
+	}
+}
+
 func main() {
 	//demoDefer()
+
+	// fmt.Println("--------------------------------")
 
 	// start := time.Now()
 
@@ -92,37 +139,62 @@ func main() {
 
 	// fmt.Print("Total time: ", time.Since((start)))
 
+	// fmt.Println("--------------------------------")
+
 	// go unbufferedChannel()
 
 	// go bufferedChannel()
 
 	//time.Sleep(1 * time.Second) // Sleep to allow goroutines to finish before main exits
 
-	start := time.Now()
+	// fmt.Println("--------------------------------")
 
-	var wg sync.WaitGroup
+	// start := time.Now()
+
+	// var wg sync.WaitGroup
 
 	// ch := make(chan string, 8) // buffered channel to hold results from goroutines
-	ch := make(chan string) // unbuffered channel to hold results from goroutines
+	// ch := make(chan string) // unbuffered channel to hold results from goroutines
 
-	for i := range 4 {
-		wg.Add(1)
-		go taskChannel(i+1, &wg, ch)
-	}
+	// for i := range 4 {
+	// 	wg.Add(1)
+	// 	go taskChannel(i+1, &wg, ch)
+	// }
 
-	go func() {
-		// Wait for all goroutines to finish and then close the channel
-		wg.Wait()
-		close(ch)
-	}()
+	// go func() {
+	// 	// Wait for all goroutines to finish and then close the channel
+	// 	wg.Wait()
+	// 	close(ch)
+	// }()
 
 	// for i := 0; i < 4; i++ {
 	// 	fmt.Println(<-ch)
 	// }
 
-	for result := range ch {
-		fmt.Println(result)
-	}
+	// for result := range ch {
+	// 	fmt.Println(result)
+	// }
 
-	fmt.Println("Total time:", time.Since(start))
+	// fmt.Println("Total time:", time.Since(start))
+
+	// fmt.Println("--------------------------------")
+
+	// selectChannel()
+
+	// fmt.Println("--------------------------------")
+
+	// start := time.Now()
+	// var wg sync.WaitGroup
+	// ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	// defer cancel()
+	// ctx = context.WithValue(ctx, "priority", "high")
+
+	// wg.Add(1)
+
+	// go contextExample(ctx, &wg)
+
+	// wg.Wait()
+	// fmt.Println("Total time:", time.Since(start))
+
+	fmt.Println("--------------------------------")
 }
