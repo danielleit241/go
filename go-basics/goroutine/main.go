@@ -196,5 +196,79 @@ func main() {
 	// wg.Wait()
 	// fmt.Println("Total time:", time.Since(start))
 
+	// fmt.Println("--------------------------------")
+
+	// burgerCh := make(chan string)
+	// pizzaCh := make(chan string)
+
+	// ctx, cancel := context.WithTimeout(context.Background(), 1500*time.Millisecond)
+	// defer cancel()
+
+	// go cookBurger(burgerCh, ctx)
+	// go cookPizza(pizzaCh, ctx)
+
+	// for i := 0; i < 2; i++ {
+	// 	select {
+	// 	case burgerResult, ok := <-burgerCh:
+	// 		if ok {
+	// 			fmt.Println("Burger result:", burgerResult)
+	// 		}
+	// 	case pizzaResult, ok := <-pizzaCh:
+	// 		if ok {
+	// 			fmt.Println("Pizza result:", pizzaResult)
+	// 		}
+	// 	case <-ctx.Done():
+	// 		fmt.Println("Context timeout, canceling cooking")
+	// 		return
+	// 	}
+	// }
+
 	fmt.Println("--------------------------------")
+	raceCondition()
+}
+
+func raceCondition() {
+	token := 0
+	var wg sync.WaitGroup
+
+	var mu sync.Mutex // Mutex to protect access to the shared variable
+
+	start := time.Now()
+
+	for range 1000 {
+		wg.Add(1)
+		go func() {
+			mu.Lock()
+			token++
+			mu.Unlock()
+
+			wg.Done()
+		}()
+	}
+	wg.Wait()
+	fmt.Println("Final token value:", token, "Time taken:", time.Since(start))
+
+	// To avoid race condition, we can use sync.Mutex to lock the critical section of code that modifies the shared variable (token in this case) to ensure that only one goroutine can access it at a time.
+}
+
+func cookBurger(burgerCh chan<- string, ctx context.Context) {
+	fmt.Println("Start to cook burger")
+	select {
+	case <-time.After(1 * time.Second):
+		burgerCh <- "Burger is cooked"
+	case <-ctx.Done():
+		fmt.Println("Cooking burger is canceled")
+		return
+	}
+}
+
+func cookPizza(pizzaCh chan<- string, ctx context.Context) {
+	fmt.Println("Start to cook pizza")
+	select {
+	case <-time.After(2 * time.Second):
+		pizzaCh <- "Pizza is cooked"
+	case <-ctx.Done():
+		fmt.Println("Cooking pizza is canceled")
+		return
+	}
 }
