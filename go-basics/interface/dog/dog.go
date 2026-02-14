@@ -49,3 +49,7 @@ func (d *Dog) Play() string {
 func (d *Dog) Run() string {
 	return d.Name + " is running fast!"
 }
+
+func (d *Dog) String() string { // Implementing the Stringer interface for better string representation of Dog
+	return "Name: " + d.Name + "\n Speak: " + d.Speak() + "\n Eat: " + d.Eat() + "\n Extra: " + d.Extra() + "\n Play: " + d.Play() + "\n Run: " + d.Run()
+}

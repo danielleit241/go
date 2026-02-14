@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	dog, err := dog.New("Buddy")
+	dog1, err := dog.New("Buddy")
 	if err != nil {
 		panic(err) // stop execution if error occurs
 	}
@@ -20,12 +20,12 @@ func main() {
 	}
 
 	fmt.Print("Dog make sound plus: ")
-	MakeSoundPlus(dog) // dog implements AnimalPlus
+	MakeSoundPlus(dog1) // dog implements AnimalPlus
 	fmt.Print("Cat make sound: ")
 	MakeSound(cat) // cat implements Animal
 
 	fmt.Print("Dog make action: ")
-	MakeAction(dog) // dog implements AnimalActions
+	MakeAction(dog1) // dog implements AnimalActions
 	fmt.Print("Cat make action: ")
 	MakeAction(cat) // cat implements AnimalActions
 
@@ -37,12 +37,18 @@ func main() {
 	fmt.Print(mouse.Run() + "\n") // Directly call Run method
 
 	fmt.Println("Empty interface: ")
-	PrintValueV1("The dog name is: " + dog.Name + "\n")
-	PrintValueV2("The dog name is: " + dog.Name)
+	PrintValueV1("The dog name is: " + dog1.Name + "\n")
+	PrintValueV2("The dog name is: " + dog1.Name)
 	PrintValues(42)
 	PrintValues(true)
 	PrintStringValue("Hello, World!")
 	// PrintStringValue(100) // Not a string value
+
+	cookie, err := dog.New("Cookie")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Cookie's String representation:\n", cookie) // String() method will be called automatically when printing the struct, providing a more detailed representation of the Dog instance.
 }
 
 func MakeSound(a interfaces.Animal) {
