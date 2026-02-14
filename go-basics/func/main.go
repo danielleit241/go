@@ -5,8 +5,18 @@ import (
 	"time"
 )
 
+//closure function
+
+func adder() func(int) int {
+	sum := 0
+	return func(x int) int {
+		sum += x
+		return sum
+	}
+}
+
 func main() {
-	menu()
+	//menu()
 
 	// var number1, number2 int
 	// var op string
@@ -31,6 +41,11 @@ func main() {
 	// fmt.Printf("Before swap: a = %s, b = %s\n", a, b)
 	// a, b = swap(a, b)
 	// fmt.Printf("After swap: a = %s, b = %s\n", a, b)
+
+	pos, neg := adder(), adder()
+	for i := 0; i < 5; i++ {
+		fmt.Println("Positive:", pos(i), "Negative:", neg(-2*i))
+	}
 }
 
 // return multiple values function
