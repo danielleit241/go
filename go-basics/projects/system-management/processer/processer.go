@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"example.com/go/model"
 	"example.com/go/monitor/cpu"
 	"example.com/go/monitor/mem"
 )
@@ -14,7 +15,7 @@ type Processer interface {
 	cpu.CPUMonitor | mem.MemMonitor
 }
 
-func RunMonitoring(ctx context.Context, wg *sync.WaitGroup) {
+func RunMonitoring(ctx context.Context, wg *sync.WaitGroup, statCh chan<- model.SystemStat, monitor model.Monitor) {
 
 	defer wg.Done()
 	timeInterval := 1000 * time.Millisecond
@@ -27,19 +28,8 @@ func RunMonitoring(ctx context.Context, wg *sync.WaitGroup) {
 			fmt.Println("Monitoring stopped.")
 			return
 		case <-ticker.C:
-			cpu := cpu.NewCPUMonitor(timeInterval)
-			usage, _ := cpu.CheckCPUUsage(ctx)
-			fmt.Printf("%s: %s\n", cpu.GetName(), usage)
-			// if isHigh {
-			// 	fmt.Println("Warning: CPU usage is high!")
-			// }
-
-			mem := mem.NewMemMonitor(timeInterval)
-			memUsage, _ := mem.CheckMemUsage(ctx)
-			fmt.Printf("%s: %s\n", mem.GetName(), memUsage)
-			// if memIsHigh {
-			// 	fmt.Println("Warning: Memory usage is high!")
-			// }
+			usage, _ := monitor.CheckUsage(ctx)
+			statCh <- model.SystemStat{Name: monitor.GetName(), Value: usage}
 		}
 	}
 }

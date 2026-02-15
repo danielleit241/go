@@ -20,7 +20,7 @@ func (m *MemMonitor) GetName() string {
 	return "Memory"
 }
 
-func (m *MemMonitor) CheckMemUsage(ctx context.Context) (string, bool) {
+func (m *MemMonitor) CheckUsage(ctx context.Context) (string, bool) {
 	vmStat, err := mem.VirtualMemoryWithContext(ctx)
 	if err != nil {
 		strErr := fmt.Sprintf("[Memory Monitor] Could not retrieve Memory info: %v \n", err)

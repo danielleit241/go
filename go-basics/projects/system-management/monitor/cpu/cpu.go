@@ -20,7 +20,7 @@ func (m *CPUMonitor) GetName() string {
 	return "CPU"
 }
 
-func (m *CPUMonitor) CheckCPUUsage(ctx context.Context) (string, bool) {
+func (m *CPUMonitor) CheckUsage(ctx context.Context) (string, bool) {
 	percent, err := cpu.PercentWithContext(ctx, m.Interval, false)
 	if err != nil {
 		return "N/A", false
