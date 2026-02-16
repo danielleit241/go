@@ -3,6 +3,7 @@ package processer
 import (
 	"context"
 	"fmt"
+	"os"
 	"sort"
 	"strings"
 	"sync"
@@ -143,5 +144,41 @@ func GetTopProcesses(ctx context.Context, cpuMaxPercent float64, memMaxPercent f
 			i+1, proc.ID, proc.Name, proc.CPUPercent, proc.MemPercent, proc.RunningTime)
 	}
 
+	ExportTopProcessesToCSV(cpuList, memList)
+
 	return output.String()
+}
+
+func ExportTopProcessesToCSV(cpuList, memList []model.ProcessStat) string {
+	// O_CREATE: Tạo file mới nếu chưa tồn tại, hoặc xóa nội dung cũ nếu đã tồn tại
+	// O_WRONLY: Mở file ở chế độ chỉ ghi
+	// O_APPEND: Ghi thêm vào cuối file thay vì ghi đè
+	// 0644: Quyền truy cập file (owner có quyền đọc và ghi, group và others chỉ có quyền đọc)
+	file, err := os.OpenFile("top_process_stats.csv", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+	if err != nil {
+		return fmt.Sprintf("[Export to CSV] Could not open file: %v \n", err)
+	}
+
+	defer file.Close()
+
+	if stat, err := file.Stat(); err == nil && stat.Size() == 0 {
+		// Ghi header nếu file mới tạo hoặc đã bị xóa nội dung
+		file.WriteString("Timestamp,PID,Name,CPU (%),Memory (%),Running Time\n")
+	}
+
+	timestamp := time.Now().Format(time.RFC3339) // Định dạng thời gian theo chuẩn ISO 8601
+
+	for _, proc := range cpuList {
+		line := fmt.Sprintf("%s,%d,%s,%.2f,%.2f,%.2f\n",
+			timestamp, proc.ID, proc.Name, proc.CPUPercent, proc.MemPercent, proc.RunningTime)
+		file.WriteString(line)
+	}
+
+	for _, proc := range memList {
+		line := fmt.Sprintf("%s,%d,%s,%.2f,%.2f,%.2f\n",
+			timestamp, proc.ID, proc.Name, proc.CPUPercent, proc.MemPercent, proc.RunningTime)
+		file.WriteString(line)
+	}
+
+	return "Exported top processes to top_process_stats.csv"
 }
