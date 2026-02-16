@@ -32,8 +32,14 @@ func RunMonitoring(ctx context.Context, wg *sync.WaitGroup, statCh chan<- model.
 			fmt.Println("Monitoring stopped.")
 			return
 		case <-ticker.C:
-			usage, _ := monitor.CheckUsage(ctx)
-			statCh <- model.SystemStat{Name: monitor.GetName(), Value: usage}
+			usage, alert := monitor.CheckUsage(ctx)
+
+			stat := model.SystemStat{Name: monitor.GetName(), Value: usage}
+
+			if alert {
+				LogAlerts(stat)
+			}
+			statCh <- stat
 		}
 	}
 }
@@ -181,4 +187,18 @@ func ExportTopProcessesToCSV(cpuList, memList []model.ProcessStat) string {
 	}
 
 	return "Exported top processes to top_process_stats.csv"
+}
+
+func LogAlerts(stat model.SystemStat) {
+	file, err := os.OpenFile("alerts.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+	if err != nil {
+		fmt.Printf("[Log Alerts] Could not open log file: %v \n", err)
+		return
+	}
+	defer file.Close()
+
+	logEntry := fmt.Sprintf("%s - ALERT: %s usage is high: %s\n", time.Now().Format(time.RFC3339), stat.Name, stat.Value)
+	if _, err := file.WriteString(logEntry); err != nil {
+		fmt.Printf("[Log Alerts] Could not write to log file: %v \n", err)
+	}
 }
