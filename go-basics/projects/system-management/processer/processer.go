@@ -3,6 +3,7 @@ package processer
 import (
 	"context"
 	"fmt"
+	"sort"
 	"sync"
 	"time"
 
@@ -43,6 +44,9 @@ func GetTopProcesses(ctx context.Context) string {
 
 	var wg sync.WaitGroup
 	var mu sync.Mutex
+	var cpuList, memList []model.ProcessStat
+
+	procChan := make(chan model.ProcessStat, len(processes))
 
 	for _, proc := range processes {
 		wg.Add(1)
@@ -83,14 +87,52 @@ func GetTopProcesses(ctx context.Context) string {
 						MemPercent:  memPercent,
 						RunningTime: float32(runningTime.Seconds()),
 					}
-
-					fmt.Println(procStat)
+					procChan <- procStat
 				}
 			}
 		}(proc)
 	}
 
-	wg.Wait()
+	go func() {
+		wg.Wait()
+		close(procChan)
+	}()
 
-	return ""
+	for procStat := range procChan {
+		if procStat.CPUPercent > 5.0 {
+			cpuList = append(cpuList, procStat)
+		}
+
+		if procStat.MemPercent > 1.0 {
+			memList = append(memList, procStat)
+		}
+	}
+
+	sort.Slice(cpuList, func(i, j int) bool {
+		return cpuList[i].CPUPercent > cpuList[j].CPUPercent
+	})
+
+	sort.Slice(memList, func(i, j int) bool {
+		return memList[i].MemPercent > memList[j].MemPercent
+	})
+
+	output := "Top 5 CPU-consuming processes:\n"
+	for i, proc := range cpuList {
+		if i >= 5 {
+			break
+		}
+		output += fmt.Sprintf("PID: %d, Name: %s, CPU: %.2f%%, Mem: %.2f%%, Running Time: %.2fs\n",
+			proc.ID, proc.Name, proc.CPUPercent, proc.MemPercent, proc.RunningTime)
+	}
+
+	output += "\nTop 5 Memory-consuming processes:\n"
+	for i, proc := range memList {
+		if i >= 5 {
+			break
+		}
+		output += fmt.Sprintf("PID: %d, Name: %s, CPU: %.2f%%, Mem: %.2f%%, Running Time: %.2fs\n",
+			proc.ID, proc.Name, proc.CPUPercent, proc.MemPercent, proc.RunningTime)
+	}
+
+	return output
 }

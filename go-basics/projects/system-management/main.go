@@ -54,7 +54,8 @@ func main() {
 			fmt.Println("-----")
 			model.StartMutex.Unlock()
 
-			processer.GetTopProcesses(ctx)
+			topProcesses := processer.GetTopProcesses(ctx)
+			fmt.Println(topProcesses)
 		}
 	}()
 
