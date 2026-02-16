@@ -19,6 +19,8 @@ func main() {
 	defer cancel()
 
 	timeInterval := 1000 * time.Millisecond
+	cpuMaxPercent := 5.0
+	memMaxPercent := float32(1.0)
 
 	monitorList := []model.Monitor{
 		&cpu.CPUMonitor{Interval: timeInterval}, // new CPUMonitor()
@@ -54,7 +56,7 @@ func main() {
 			fmt.Println("-----")
 			model.StartMutex.Unlock()
 
-			topProcesses := processer.GetTopProcesses(ctx)
+			topProcesses := processer.GetTopProcesses(ctx, cpuMaxPercent, memMaxPercent)
 			fmt.Println(topProcesses)
 		}
 	}()

@@ -24,7 +24,7 @@ func (m *DiskMonitor) GetName() string {
 func (m *DiskMonitor) CheckUsage(ctx context.Context) (string, bool) {
 	path := "/"
 	if runtime.GOOS == "windows" {
-		path = "C:"
+		path = "C:\\"
 	}
 
 	diskStat, err := disk.UsageWithContext(ctx, path)
@@ -33,7 +33,7 @@ func (m *DiskMonitor) CheckUsage(ctx context.Context) (string, bool) {
 		return strErr, false
 	}
 
-	value := fmt.Sprintf("%.2f%% used", diskStat.UsedPercent)
+	value := fmt.Sprintf("Used capacity on drive C: %.2f%%", diskStat.UsedPercent)
 
 	return value, diskStat.UsedPercent > 60
 }
