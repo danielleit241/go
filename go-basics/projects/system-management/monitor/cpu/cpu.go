@@ -23,8 +23,10 @@ func (m *CPUMonitor) GetName() string {
 func (m *CPUMonitor) CheckUsage(ctx context.Context) (string, bool) {
 	percent, err := cpu.PercentWithContext(ctx, m.Interval, false)
 	if err != nil {
-		return "N/A", false
+		value := fmt.Sprintf("[CPU Monitor] Could not retrieve CPU usage: %v \n", err)
+		return value, false
 	}
+
 	if len(percent) > 0 {
 		value := fmt.Sprintf("%.2f%%", percent[0])
 		return value, percent[0] > 60

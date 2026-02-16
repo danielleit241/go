@@ -19,8 +19,9 @@ func main() {
 	defer cancel()
 
 	timeInterval := 1000 * time.Millisecond
+
 	monitorList := []model.Monitor{
-		&cpu.CPUMonitor{Interval: timeInterval},
+		&cpu.CPUMonitor{Interval: timeInterval}, // new CPUMonitor()
 		&mem.MemMonitor{Interval: timeInterval},
 		&net.NetMonitor{Interval: timeInterval},
 		&disk.DiskMonitor{Interval: timeInterval},
@@ -48,10 +49,12 @@ func main() {
 			time.Sleep(5 * time.Second)
 			model.StartMutex.Lock()
 			for _, stat := range model.StatMap {
-				fmt.Printf("[%s]: %v\n", stat.Name, stat.Value)
+				fmt.Print(stat)
 			}
 			fmt.Println("-----")
 			model.StartMutex.Unlock()
+
+			processer.GetTopProcesses(ctx)
 		}
 	}()
 
