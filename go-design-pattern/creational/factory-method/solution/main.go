@@ -30,6 +30,7 @@ func (n *NotificationService) SendNotification(message string) {
 	n.notifier.Send(message)
 }
 
+// SOLUTION:
 // Factory method to create the notifier based on the type of notification.
 func CreateNotifier(notificationType string) Notifier {
 	switch notificationType {
