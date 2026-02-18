@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"example.com/go/pkg/utils"
+	"github.com/danielleit241/pkg/utils"
 )
 
 func ReadInput(prompt string) string {

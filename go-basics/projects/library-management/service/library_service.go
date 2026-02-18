@@ -3,8 +3,8 @@ package service
 import (
 	"time"
 
-	"example.com/go/entity"
-	"example.com/go/repository"
+	"github.com/danielleit241/entity"
+	"github.com/danielleit241/repository"
 )
 
 type LibraryReader interface {

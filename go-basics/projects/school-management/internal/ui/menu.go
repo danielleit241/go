@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"example.com/go/internal/entity"
-	"example.com/go/internal/service"
+	"github.com/danielleit241/internal/entity"
+	"github.com/danielleit241/internal/service"
 )
 
 type Menu struct {

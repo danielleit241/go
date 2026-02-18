@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 
-	"example.com/go/cat"
-	"example.com/go/dog"
-	"example.com/go/interfaces"
-	"example.com/go/mouse"
+	"github.com/danielleit241/cat"
+	"github.com/danielleit241/dog"
+	"github.com/danielleit241/interfaces"
+	"github.com/danielleit241/mouse"
 )
 
 func main() {

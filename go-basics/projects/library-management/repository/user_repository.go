@@ -1,6 +1,6 @@
 package repository
 
-import "example.com/go/entity"
+import "github.com/danielleit241/entity"
 
 type UserRepository interface {
 	Repository[entity.User]

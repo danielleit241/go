@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"example.com/go/model"
+	"github.com/danielleit241/model"
 )
 
 func main() {

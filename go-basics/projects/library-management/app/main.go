@@ -1,9 +1,9 @@
 package main
 
 import (
-	"example.com/go/repository"
-	"example.com/go/service"
-	"example.com/go/ui"
+	"github.com/danielleit241/repository"
+	"github.com/danielleit241/service"
+	"github.com/danielleit241/ui"
 )
 
 func main() {

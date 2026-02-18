@@ -1,6 +1,6 @@
 package entity
 
-import "example.com/go/utils"
+import "github.com/danielleit241/utils"
 
 type Transaction struct {
 	ID         string

@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"example.com/go/employee"
+	"github.com/danielleit241/employee"
 )
 
 func ArrayExample() {

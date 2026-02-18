@@ -3,8 +3,8 @@ package ui
 import (
 	"fmt"
 
-	"example.com/go/service"
-	"example.com/go/utils"
+	"github.com/danielleit241/service"
+	"github.com/danielleit241/utils"
 )
 
 type Menu struct {
@@ -88,8 +88,8 @@ func (m *Menu) registerUser() {
 }
 
 func (m *Menu) borrowBook() {
-	bookID := utils.GetBookID("Book ID: ")
-	userID := utils.GetUserID("User ID: ")
+	bookID := utils.GetID("Book ID: ")
+	userID := utils.GetID("User ID: ")
 
 	if err := m.LibraryService.BorrowBook(bookID, userID); err != nil {
 		fmt.Println("Error:", err)
@@ -100,10 +100,9 @@ func (m *Menu) borrowBook() {
 }
 
 func (m *Menu) returnBook() {
-	bookID := utils.GetBookID("Book ID: ")
-	userID := utils.GetUserID("User ID: ")
+	transId := utils.GetID("Transaction ID: ")
 
-	if err := m.LibraryService.ReturnBook(bookID, userID); err != nil {
+	if err := m.LibraryService.ReturnBook(transId); err != nil {
 		fmt.Println("Error:", err)
 		return
 	}

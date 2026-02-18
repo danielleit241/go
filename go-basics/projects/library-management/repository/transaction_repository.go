@@ -3,7 +3,7 @@ package repository
 import (
 	"time"
 
-	"example.com/go/entity"
+	"github.com/danielleit241/entity"
 )
 
 type TransactionRepository interface {

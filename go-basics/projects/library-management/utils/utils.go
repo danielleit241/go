@@ -138,25 +138,14 @@ func GetUserEmail(prompt string) string {
 	}
 }
 
-func GetBookID(prompt string) string {
+func GetID(prompt string) string {
 	for {
-		bookID := ReadInput(prompt)
-		if ok, errMsg := ValidateTransactionBookID(bookID); !ok {
+		id := ReadInput(prompt)
+		if ok, errMsg := ValidateUUID(id); !ok {
 			fmt.Println("Error:", errMsg)
 			continue
 		}
-		return bookID
-	}
-}
-
-func GetUserID(prompt string) string {
-	for {
-		userID := ReadInput(prompt)
-		if ok, errMsg := ValidateTransactionUserID(userID); !ok {
-			fmt.Println("Error:", errMsg)
-			continue
-		}
-		return userID
+		return id
 	}
 }
 

@@ -6,12 +6,12 @@ import (
 	"sync"
 	"time"
 
-	"example.com/go/model"
-	"example.com/go/monitor/cpu"
-	"example.com/go/monitor/disk"
-	"example.com/go/monitor/mem"
-	"example.com/go/monitor/net"
-	"example.com/go/processer"
+	"github.com/danielleit241/model"
+	"github.com/danielleit241/monitor/cpu"
+	"github.com/danielleit241/monitor/disk"
+	"github.com/danielleit241/monitor/mem"
+	"github.com/danielleit241/monitor/net"
+	"github.com/danielleit241/processer"
 )
 
 func main() {

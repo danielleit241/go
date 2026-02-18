@@ -1,6 +1,6 @@
 package repository
 
-import "example.com/go/internal/entity"
+import "github.com/danielleit241/internal/entity"
 
 type LecturerReader interface {
 	BaseReader[entity.Lecturer]

@@ -3,7 +3,7 @@ package repository
 import (
 	"strings"
 
-	"example.com/go/internal/entity"
+	"github.com/danielleit241/internal/entity"
 )
 
 type StudentReader interface {

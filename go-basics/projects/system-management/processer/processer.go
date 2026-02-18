@@ -9,9 +9,9 @@ import (
 	"sync"
 	"time"
 
-	"example.com/go/model"
-	"example.com/go/monitor/cpu"
-	"example.com/go/monitor/mem"
+	"github.com/danielleit241/model"
+	"github.com/danielleit241/monitor/cpu"
+	"github.com/danielleit241/monitor/mem"
 	"github.com/shirou/gopsutil/process"
 )
 

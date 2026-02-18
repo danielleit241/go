@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strings"
 
-	"example.com/go/interfaces"
+	"github.com/danielleit241/interfaces"
 )
 
 type Mouse struct {

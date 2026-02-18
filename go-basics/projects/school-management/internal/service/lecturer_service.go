@@ -3,8 +3,8 @@ package service
 import (
 	"strings"
 
-	"example.com/go/internal/entity"
-	"example.com/go/internal/repository"
+	"github.com/danielleit241/internal/entity"
+	"github.com/danielleit241/internal/repository"
 )
 
 type LecturerService interface {
