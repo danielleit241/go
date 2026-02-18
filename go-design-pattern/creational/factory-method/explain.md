@@ -1,53 +1,54 @@
 # Factory Method
 
-## Định nghĩa
+## 1) Định nghĩa
 
-**Factory Method (Function Constructor Style)** là cách áp dụng Factory Pattern bằng cách:
+**Factory Method** là mẫu thiết kế tạo đối tượng, trong đó việc khởi tạo object được đưa vào một hàm factory thay vì để client khởi tạo trực tiếp.
 
-- Sử dụng **function type**
-- Dùng **factory function** để tạo ra implementation phù hợp
-- Tách logic tạo handler / object khỏi code client
+Ý tưởng chính:
 
----
-
-## Hiểu đơn giản
-
-Factory constructor function giúp bạn:
-
-- Không cần dùng `new` hoặc struct cụ thể trong client
-- Gom logic tạo object / handler vào 1 function duy nhất
-- Dễ thêm loại implementation mới
-- Giữ code **clean – ít boilerplate – dễ maintain**
+- Client chỉ làm việc với interface chung (ví dụ `Notifier`)
+- Logic chọn implementation (`EmailNotifier`, `SMSNotifier`, ...) nằm trong factory method
+- Việc tạo object được gom về một nơi duy nhất
 
 ---
 
-## Ý tưởng cốt lõi
+## 2) Vấn đề trong ví dụ `problem`
 
-Thay vì:
+Trong [creational/factory-method/problem/main.go](creational/factory-method/problem/main.go):
 
-```
-                +----------------+
-Input Type ---> |   if / switch  |
-                +----------------+
-                 /      |       \
-                /       |        \
-         New Email   New SMS   New Push
+- `NotificationService` phụ thuộc trực tiếp vào concrete type (`&EmailNotifier{}`)
+- User/client phải biết implementation cụ thể để khởi tạo
+- Khi thêm loại notifier mới, code khởi tạo dễ bị sửa ở nhiều chỗ
+
+Điều này làm tăng coupling giữa client và concrete implementation.
+
+---
+
+## 3) Cách giải trong ví dụ `solution`
+
+Trong [creational/factory-method/solution/main.go](creational/factory-method/solution/main.go):
+
+- Thêm factory method `CreateNotifier(notificationType string) Notifier`
+- Factory dùng `switch` để chọn và trả về notifier phù hợp
+- `NotificationService` chỉ nhận `Notifier`, không cần biết concrete type
+
+Ví dụ sử dụng:
+
+```go
+s := NotificationService{
+	notifier: CreateNotifier("email"),
+}
 ```
 
-Ta sẽ:
+Như vậy client gọi factory để lấy `Notifier` thay vì tự `new` concrete struct.
 
-```
-                    +-------------------+
-Input Type -------> | Factory Function  |
-                    |  (NewNotifier)    |
-                    +-------------------+
-                               |
-                               v
-                       +----------------+
-                       | NotifierFunc   | (Function Type)
-                       +----------------+
-                         /      |      \
-                        /       |       \
-                       v        v        v
-                Email Func   SMS Func   Push Func
-```
+---
+
+## 4) Tóm tắt
+
+Factory Method giúp bạn viết code theo hướng mở rộng tốt hơn:
+
+- Client biết **dùng gì** (interface `Notifier`)
+- Factory quyết định **tạo gì** (`EmailNotifier`, `SMSNotifier`, ...)
+
+Trong ví dụ này, pattern giúp ẩn chi tiết khởi tạo, giảm coupling và dễ thêm loại notifier mới.

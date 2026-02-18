@@ -16,6 +16,10 @@ type SenderFactory struct {
 	cacheSender map[string]*Sender
 }
 
+func CreateSenderFactory() *SenderFactory {
+	return &SenderFactory{cacheSender: make(map[string]*Sender)}
+}
+
 func (f *SenderFactory) GetSender(name string) *Sender {
 	if sender, ok := f.cacheSender[name]; ok {
 		return sender
@@ -28,7 +32,7 @@ func (f *SenderFactory) GetSender(name string) *Sender {
 }
 
 func main() {
-	factory := &SenderFactory{cacheSender: make(map[string]*Sender)}
+	factory := CreateSenderFactory()
 	messages := []ChatMessage{
 		{Content: "hi", Sender: factory.GetSender("Peter")},
 		{Content: "oh, here you are", Sender: factory.GetSender("Mary")},
