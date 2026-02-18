@@ -32,6 +32,14 @@ type application struct {
 }
 
 func (app *application) GetConfig() *config {
+	// This is not thread-safe, and it will create multiple config instances if called concurrently.
+	// if app.cfg == nil {
+	// 	log.Println("It should be run only once. But you'll it many times!!")
+	// 	app.loadConfig()
+	// }
+
+	// return app.cfg
+
 	if app.cfg == nil {
 		app.once.Do(func() {
 			log.Println("Loading config once and forever.")
