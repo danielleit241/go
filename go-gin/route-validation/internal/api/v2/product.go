@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"strconv"
 
+	"github.com/danielleit241/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,9 +22,6 @@ var products = []Product{
 	{ID: 2, Name: "Product B", Slug: "product-b", Price: 29.99, Category: "Clothing"},
 	{ID: 3, Name: "Product C", Slug: "product-c", Price: 39.99, Category: "Books"},
 }
-
-var slugRegex = `^[a-z0-9]+(?:-[a-z0-9]+)*$`
-var searchRegex = `^[a-zA-Z0-9\s]{6,99}$`
 
 var validCategories = map[string]bool{
 	"Electronics": true,
@@ -46,25 +44,28 @@ func (h *ProductHandler) GetProductsV2(c *gin.Context) {
 
 func (h *ProductHandler) SearchProductsV2(c *gin.Context) {
 	search := c.Query("query")
-	if search == "" {
+
+	if err := utils.ValidationRequired("query", search); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Query parameter 'query' is required",
+			"error": err.Error(),
 		})
 		return
 	}
-	matched, err := regexp.MatchString(searchRegex, search)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal server error",
-		})
-		return
-	}
-	if !matched {
+
+	if err := utils.ValidationLength("query", search, 6, 99); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Query parameter 'query' must be 6-99 characters long and contain only alphanumeric characters and spaces",
+			"error": err.Error(),
 		})
 		return
 	}
+
+	if err := utils.ValidationRegex("query", search, utils.StringRegex, "must contain only letters, numbers, and spaces"); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
 	limitParam := c.DefaultQuery("limit", "10") // if limit is not provided, default to 10
 	limit, err := strconv.Atoi(limitParam)
 	if err != nil || limit <= 0 {
@@ -92,16 +93,9 @@ func (h *ProductHandler) SearchProductsV2(c *gin.Context) {
 func (h *ProductHandler) GetProductBySlugV2(c *gin.Context) {
 	slug := c.Param("slug")
 
-	matched, err := regexp.MatchString(slugRegex, slug)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal server error",
-		})
-		return
-	}
-	if !matched {
+	if err := utils.ValidationRegex("slug", slug, utils.SlugRegex, "must be a valid slug format (lowercase letters, numbers, and hyphens only)"); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid slug format",
+			"error": err.Error(),
 		})
 		return
 	}
@@ -121,12 +115,14 @@ func (h *ProductHandler) GetProductBySlugV2(c *gin.Context) {
 
 func (h *ProductHandler) GetProductsByCategoryV2(c *gin.Context) {
 	category := c.Param("category")
-	if !validCategories[category] {
+
+	if err := utils.ValidatuonInMap("category", category, validCategories); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid category",
+			"error": err.Error(),
 		})
 		return
 	}
+
 	var filteredProducts []Product
 	for _, product := range products {
 		if product.Category == category {

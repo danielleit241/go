@@ -3,6 +3,7 @@ package v2handler
 import (
 	"net/http"
 
+	"github.com/danielleit241/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
@@ -36,16 +37,16 @@ func (h *UserHandler) GetUserByIDV2(c *gin.Context) {
 	uuidParam := c.Param("uuid")
 
 	// Validate that the ID is a valid UUID
-	uuid, err := uuid.Parse(uuidParam)
+	u, err := utils.ValidationUUID("id", uuidParam)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "ID must be a valid UUID",
+			"error": err.Error(),
 		})
 		return
 	}
-
+	
 	for _, user := range usersV2 {
-		if user.ID == uuid {
+		if user.ID == u {
 			c.JSON(http.StatusOK, gin.H{
 				"user": user,
 			})

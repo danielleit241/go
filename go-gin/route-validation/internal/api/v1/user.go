@@ -1,9 +1,9 @@
 package v1handler
 
 import (
-	"net/http"
 	"strconv"
 
+	"github.com/danielleit241/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -35,18 +35,10 @@ func (h *UserHandler) GetUsersV1(c *gin.Context) {
 func (h *UserHandler) GetUserByIDV1(c *gin.Context) {
 	idParam := c.Param("id")
 
-	// Validate that the ID is a valid integer
-	id, err := strconv.Atoi(idParam)
+	id, err := utils.ValidationPositiveInteger("id", idParam)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "ID must be a number",
-		})
-		return
-	}
-
-	if id <= 0 {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "ID must be a positive integer",
+		c.JSON(400, gin.H{
+			"error": err.Error(),
 		})
 		return
 	}
