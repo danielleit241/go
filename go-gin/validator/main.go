@@ -2,11 +2,16 @@ package main
 
 import (
 	"github.com/danielleit241/internal/api"
+	"github.com/danielleit241/utils"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	r := gin.Default()
+
+	if err := utils.RegisterValidators(); err != nil {
+		panic("Failed to register custom validators: " + err.Error())
+	}
 
 	v1 := r.Group("/api/v1")
 	{

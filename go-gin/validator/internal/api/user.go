@@ -11,7 +11,7 @@ type UserController struct {
 }
 
 type GetByUserIDParam struct {
-	ID int `uri:"id" binding:"required,gt=0"`
+	ID int `uri:"id" binding:"gt=0"`
 }
 
 func NewUserController() *UserController {
@@ -33,6 +33,7 @@ func (ctrl *UserController) GetUserByID(c *gin.Context) {
 
 	c.JSON(200, gin.H{
 		"message": "Get user by ID - v1",
+		"id":      param.ID,
 	})
 }
 
