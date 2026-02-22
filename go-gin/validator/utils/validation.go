@@ -49,6 +49,9 @@ var validationErrorMessages = map[string]ErrorMessageFunc{
 	"date": func(field, tag, param string) string {
 		return fmt.Sprintf("%s must be a valid date in the format %s", field, param)
 	},
+	"image": func(field, tag, param string) string {
+		return fmt.Sprintf("%s must be a valid image URL (must end with .jpg, .jpeg, .png, or .gif)", field)
+	},
 }
 
 type CustomValidator struct {
@@ -68,6 +71,10 @@ var customValidators = []CustomValidator{
 	{
 		Tag: "search",
 		Fn:  validateSearch,
+	},
+	{
+		Tag: "image",
+		Fn:  validateImage,
 	},
 }
 
@@ -89,6 +96,20 @@ func validateCategory(fl validator.FieldLevel) bool {
 func validateSearch(fl validator.FieldLevel) bool {
 	var searchRegex = regexp.MustCompile(`^[a-zA-Z0-9\s]+$`)
 	return searchRegex.MatchString(fl.Field().String())
+}
+
+func validateImage(fl validator.FieldLevel) bool {
+	validImage := []string{".jpg", ".jpeg", ".png", ".gif"}
+	url := fl.Field().String()
+	var urlRegex = regexp.MustCompile(`^https?://[^\s]+$`)
+	return urlRegex.MatchString(url) && func() bool {
+		for _, ext := range validImage {
+			if strings.HasSuffix(url, ext) {
+				return true
+			}
+		}
+		return false
+	}()
 }
 
 func HandleValidationError(err error) gin.H {

@@ -30,6 +30,7 @@ func main() {
 			product.GET("/category/:category", productController.GetProductsByCategory)
 			product.GET("/slug/:slug", productController.GetProductBySlug)
 			product.GET("/:id", productController.GetProductByID)
+			product.POST("/", productController.CreateProduct)
 		}
 	}
 

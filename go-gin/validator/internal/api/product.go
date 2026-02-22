@@ -29,6 +29,20 @@ type SearchProductsQuery struct {
 	Limit int    `form:"limit" binding:"omitempty,gte=1,lte=100"`
 }
 
+type ProductImage struct {
+	ImageName string `json:"image_name" binding:"required"`
+	URL       string `json:"url" binding:"required,url,image"`
+}
+
+type CreateProductRequest struct {
+	Name        string         `json:"name" binding:"required,min=3,max=100"`
+	Description string         `json:"description" binding:"required,min=10"`
+	Price       float64        `json:"price" binding:"required,gt=0"`
+	Category    string         `json:"category" binding:"required,oneof=electronics books clothing home"`
+	Display     *bool          `json:"display" binding:"omitempty"`
+	Images      []ProductImage `json:"images" binding:"required,dive,required"` // required and validate each image in the array
+}
+
 func NewProductController() *ProductController {
 	return &ProductController{}
 }
@@ -93,5 +107,23 @@ func (ctrl *ProductController) GetProductByID(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Get product by ID - v1",
 		"id":      param.ID,
+	})
+}
+
+func (ctrl *ProductController) CreateProduct(c *gin.Context) {
+	var req CreateProductRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, utils.HandleValidationError(err))
+		return
+	}
+
+	if req.Display == nil {
+		defaultDisplay := true
+		req.Display = &defaultDisplay
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Create product - v1",
+		"data":    req,
 	})
 }
