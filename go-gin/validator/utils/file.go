@@ -13,13 +13,6 @@ import (
 	"github.com/google/uuid"
 )
 
-var maxImageSize int64 = 1 << 20 // 1MB
-var validImageContentTypes = map[string]bool{
-	"image/jpeg": true,
-	"image/png":  true,
-	"image/gif":  true,
-}
-
 func ValidateImage(file *multipart.FileHeader) (bool, error) {
 	if file.Size > maxImageSize {
 		return false, fmt.Errorf("Avatar image must be less than %dMB", maxImageSize/(1024*1024))

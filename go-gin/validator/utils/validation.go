@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -78,22 +77,11 @@ var customValidators = []CustomValidator{
 	},
 }
 
-var slugRegex = regexp.MustCompile(`^[a-z0-9]+(?:-[a-z0-9]+)*$`)
-var searchRegex = regexp.MustCompile(`^[a-zA-Z0-9\s]+$`)
-var validImage = []string{".jpg", ".jpeg", ".png", ".gif"}
-var urlRegex = regexp.MustCompile(`^https?://[^\s]+$`)
-
 func validateSlug(fl validator.FieldLevel) bool {
 	return slugRegex.MatchString(fl.Field().String())
 }
 
 func validateCategory(fl validator.FieldLevel) bool {
-	var validCategory = map[string]bool{
-		"electronics": true,
-		"books":       true,
-		"clothing":    true,
-		"home":        true,
-	}
 	return validCategory[strings.TrimSpace(strings.ToLower(fl.Field().String()))]
 }
 
