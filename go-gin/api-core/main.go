@@ -21,7 +21,7 @@ func main() {
 	r := gin.Default()
 
 	//Global middleware
-	r.Use(middleware.BasicMiddleware(), middleware.RateLimit())
+	r.Use(middleware.Logger(), middleware.ApiKeyAuth(), middleware.RateLimit())
 
 	v1 := r.Group("/api/v1")
 	{
