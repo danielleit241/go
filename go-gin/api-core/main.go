@@ -2,16 +2,26 @@ package main
 
 import (
 	"github.com/danielleit241/internal/api"
+	"github.com/danielleit241/middleware"
 	"github.com/danielleit241/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	r := gin.Default()
 
 	if err := utils.RegisterValidators(); err != nil {
 		panic("Failed to register custom validators: " + err.Error())
 	}
+
+	if err := godotenv.Load(); err != nil {
+		panic("Failed to load .env file: " + err.Error())
+	}
+
+	r := gin.Default()
+
+	//Global middleware
+	r.Use(middleware.BasicMiddleware(), middleware.ApiKeyAuth())
 
 	v1 := r.Group("/api/v1")
 	{
@@ -33,6 +43,14 @@ func main() {
 			product.GET("/slug/:slug", productController.GetProductBySlug)
 			product.GET("/:id", productController.GetProductByID)
 			product.POST("/", productController.CreateProduct)
+		}
+
+		auth := v1.Group("/auth")
+		{
+			auth.Use(middleware.AdminSecret())
+			authController := api.NewAuthController()
+			auth.POST("/api-key", authController.GenerateAPIKey)
+			auth.DELETE("/api-key/:id", authController.DeleteAPIKey)
 		}
 	}
 
