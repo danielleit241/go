@@ -118,21 +118,47 @@ func HandleValidationError(err error) gin.H {
 		return gin.H{"error": "Invalid error type"}
 	}
 
-	errorMessages := make(map[string]string)
+	errorMessages := make(map[string]string, len(validErr))
 	for _, e := range validErr {
-		fieldName := e.Field()
-		tag := e.Tag()
-		param := e.Param()
-		if msgFunc, exists := validationErrorMessages[tag]; exists {
-			if tag == "oneof" {
-				param = strings.Join(strings.Split(param, " "), ", ")
+		namespaceParts := strings.SplitN(e.Namespace(), ".", 2)
+		rawPath := e.Namespace()
+		if len(namespaceParts) == 2 {
+			rawPath = namespaceParts[1]
+		}
+
+		parts := strings.Split(rawPath, ".")
+		for i, part := range parts {
+			indexPos := strings.Index(part, "[")
+			if indexPos == -1 {
+				parts[i] = CamelCaseToSnakeCase(part)
+				continue
 			}
+
+			base := part[:indexPos]
+			index := part[indexPos:]
+			parts[i] = fmt.Sprintf("%s%s", CamelCaseToSnakeCase(base), index)
+		}
+
+		fieldName := strings.Join(parts, ".")
+		tag := e.Tag()
+		param := formatValidationParam(tag, e.Param())
+
+		if msgFunc, exists := validationErrorMessages[tag]; exists {
 			errorMessages[fieldName] = msgFunc(fieldName, tag, param)
 		} else {
 			errorMessages[fieldName] = fmt.Sprintf("%s is not valid", fieldName)
 		}
 	}
+
 	return gin.H{"errors": errorMessages}
+}
+
+func formatValidationParam(tag, param string) string {
+	if tag == "oneof" {
+		return strings.Join(strings.Fields(param), ", ")
+	}
+
+	return param
 }
 
 func RegisterValidators() error {

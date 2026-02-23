@@ -40,7 +40,9 @@ type CreateProductRequest struct {
 	Price       float64        `json:"price" binding:"required,gt=0"`
 	Category    string         `json:"category" binding:"required,oneof=electronics books clothing home"`
 	Display     *bool          `json:"display" binding:"omitempty"`
-	Images      []ProductImage `json:"images" binding:"required,dive,required"` // required and validate each image in the array
+	Images      []ProductImage `json:"images" binding:"required,dive,required"`
+	Tags        []string       `json:"tags" binding:"omitempty,dive,min=2,max=30"`
+	Metadata    map[string]any `json:"metadata" binding:"omitempty"`
 }
 
 func NewProductController() *ProductController {

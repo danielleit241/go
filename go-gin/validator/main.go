@@ -20,6 +20,8 @@ func main() {
 			userController := api.NewUserController()
 			user.GET("/", userController.GetUsers)
 			user.GET("/:id", userController.GetUserByID)
+			user.POST("/", userController.CreateUser)
+			user.PUT("/:id/avatar", userController.UpdateUserAvatar)
 		}
 
 		product := v1.Group("/products")
