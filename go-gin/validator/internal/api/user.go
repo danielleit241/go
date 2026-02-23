@@ -75,15 +75,15 @@ func (ctrl *UserController) UpdateUserAvatar(c *gin.Context) {
 		return
 	}
 
-	success, err := utils.SaveFile(image, "uploads/avatar", c)
-	if !success {
+	url, err := utils.SaveFile(image, "uploads/avatar", c)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save avatar image: " + err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message":     "Update user avatar - v1",
-		"id":          param.ID,
-		"avatar_file": image.Filename,
+		"message":    "Update user avatar - v1",
+		"id":         param.ID,
+		"avatar_url": url,
 	})
 }

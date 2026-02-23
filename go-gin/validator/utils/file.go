@@ -52,15 +52,24 @@ func getFileExtension(filename string) string {
 	return "." + strings.ToLower(parts[len(parts)-1])
 }
 
-func SaveFile(file *multipart.FileHeader, uploadDir string, c *gin.Context) (bool, error) {
+func SaveFile(file *multipart.FileHeader, uploadDir string, c *gin.Context) (string, error) {
+	uploadPath := filepath.ToSlash(uploadDir)
+	publicPath := strings.TrimPrefix(uploadPath, "uploads")
+	publicPath = strings.TrimPrefix(publicPath, "/")
+
+	publicURL := "http://localhost:8080/images/" + file.Filename
+	if publicPath != "" {
+		publicURL = "http://localhost:8080/images/" + publicPath + "/" + file.Filename
+	}
+
 	err := os.MkdirAll(uploadDir, os.ModePerm)
 	if err != nil {
-		return false, err
+		return "", err
 	}
 
 	dst := filepath.Join(uploadDir, file.Filename)
 	if err := c.SaveUploadedFile(file, dst); err != nil {
-		return false, err
+		return "", err
 	}
-	return true, nil
+	return publicURL, nil
 }
