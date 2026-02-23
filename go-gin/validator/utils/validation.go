@@ -50,7 +50,7 @@ var validationErrorMessages = map[string]ErrorMessageFunc{
 		return fmt.Sprintf("%s must be a valid date in the format %s", field, param)
 	},
 	"image": func(field, tag, param string) string {
-		return fmt.Sprintf("%s must be a valid image URL (must end with .jpg, .jpeg, .png, or .gif)", field)
+		return fmt.Sprintf("%s must be a valid image URL (must end with one of: %s)", field, strings.Join(validImage, ", "))
 	},
 }
 
@@ -78,8 +78,12 @@ var customValidators = []CustomValidator{
 	},
 }
 
+var slugRegex = regexp.MustCompile(`^[a-z0-9]+(?:-[a-z0-9]+)*$`)
+var searchRegex = regexp.MustCompile(`^[a-zA-Z0-9\s]+$`)
+var validImage = []string{".jpg", ".jpeg", ".png", ".gif"}
+var urlRegex = regexp.MustCompile(`^https?://[^\s]+$`)
+
 func validateSlug(fl validator.FieldLevel) bool {
-	var slugRegex = regexp.MustCompile(`^[a-z0-9]+(?:-[a-z0-9]+)*$`)
 	return slugRegex.MatchString(fl.Field().String())
 }
 
@@ -94,14 +98,11 @@ func validateCategory(fl validator.FieldLevel) bool {
 }
 
 func validateSearch(fl validator.FieldLevel) bool {
-	var searchRegex = regexp.MustCompile(`^[a-zA-Z0-9\s]+$`)
 	return searchRegex.MatchString(fl.Field().String())
 }
 
 func validateImage(fl validator.FieldLevel) bool {
-	validImage := []string{".jpg", ".jpeg", ".png", ".gif"}
 	url := fl.Field().String()
-	var urlRegex = regexp.MustCompile(`^https?://[^\s]+$`)
 	return urlRegex.MatchString(url) && func() bool {
 		for _, ext := range validImage {
 			if strings.HasSuffix(url, ext) {
