@@ -37,7 +37,7 @@ func (ctrl *UserController) GetUserByID(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"message": "Get user by ID - v1",
 		"id":      param.ID,
 	})
@@ -50,7 +50,7 @@ func (ctrl *UserController) CreateUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusCreated, gin.H{
 		"message": "Create user - v1",
 		"data":    req,
 	})

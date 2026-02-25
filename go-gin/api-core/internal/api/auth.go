@@ -43,7 +43,7 @@ func (ctrl *AuthController) DeleteAPIKey(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	c.JSON(http.StatusNoContent, gin.H{
 		"message": "API key deleted successfully",
 		"id":      param.ID,
 	})

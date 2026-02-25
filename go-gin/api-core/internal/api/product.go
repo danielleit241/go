@@ -124,7 +124,7 @@ func (ctrl *ProductController) CreateProduct(c *gin.Context) {
 		req.Display = &defaultDisplay
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	c.JSON(http.StatusCreated, gin.H{
 		"message": "Create product - v1",
 		"data":    req,
 	})
