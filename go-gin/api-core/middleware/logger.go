@@ -20,15 +20,36 @@ type CustomResponseWriter struct {
 	body *bytes.Buffer
 }
 
+type LogEntry struct {
+	Protocol      string              `json:"protocol"`
+	Method        string              `json:"method"`
+	Path          string              `json:"path"`
+	Query         string              `json:"query"`
+	ClientIP      string              `json:"client_ip"`
+	UserAgent     string              `json:"user_agent"`
+	Referer       string              `json:"referer"`
+	Status        int                 `json:"status"`
+	RemoteAddress string              `json:"remote_address"`
+	Headers       map[string][]string `json:"headers"`
+	RequestBody   map[string]any      `json:"request_body,omitempty"`
+	ResponseBody  any                 `json:"response_body,omitempty"`
+	DurationMs    int64               `json:"duration_ms"`
+	Timestamp     time.Time           `json:"timestamp"`
+}
+
+const (
+	multipartMaxMemory   = 32 << 20
+	responsePreviewLimit = 1000
+)
+
 func (w *CustomResponseWriter) Write(b []byte) (int, error) {
 	w.body.Write(b)
 	return w.ResponseWriter.Write(b)
 }
 
-func Logger() gin.HandlerFunc {
+func getLogger() zerolog.Logger {
 	logPath := filepath.Join("logs", "http.log")
-
-	logger := zerolog.New(&lumberjack.Logger{
+	return zerolog.New(&lumberjack.Logger{
 		Filename:   logPath,
 		MaxSize:    1, // megabytes
 		MaxBackups: 5,
@@ -36,61 +57,16 @@ func Logger() gin.HandlerFunc {
 		Compress:   true, // disabled by default
 		LocalTime:  true,
 	}).With().Timestamp().Logger()
+}
+
+func Logger() gin.HandlerFunc {
+	logger := getLogger()
 
 	return func(c *gin.Context) {
 
 		start := time.Now()
-		contentType := c.GetHeader("Content-Type")
-		requestBody := make(map[string]any)
-		var formFiles []map[string]any
 
-		if strings.HasPrefix(contentType, "multipart/form-data") {
-			if err := c.Request.ParseMultipartForm(32 << 20); err == nil && c.Request.MultipartForm != nil {
-				for key, vals := range c.Request.MultipartForm.Value {
-					if len(vals) == 1 {
-						requestBody[key] = vals[0]
-					} else {
-						requestBody[key] = vals
-					}
-				}
-			}
-			for field, files := range c.Request.MultipartForm.File {
-				for _, fileHeader := range files {
-					formFiles = append(formFiles, map[string]any{
-						"field":        field,
-						"filename":     fileHeader.Filename,
-						"size":         formatFileSize(fileHeader.Size),
-						"content_type": fileHeader.Header.Get("Content-Type"),
-					})
-				}
-			}
-
-			if len(formFiles) > 0 {
-				requestBody["files"] = formFiles
-			}
-
-		} else {
-
-			bodyBytes, err := io.ReadAll(c.Request.Body)
-			if err != nil {
-				logger.Error().Err(err).Msg("Failed to read request body")
-			}
-
-			c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
-
-			if strings.HasPrefix(contentType, "application/json") {
-				_ = json.Unmarshal(bodyBytes, &requestBody)
-			} else {
-				values, _ := url.ParseQuery(string(bodyBytes))
-				for key, vals := range values {
-					if len(vals) == 1 {
-						requestBody[key] = vals[0]
-					} else {
-						requestBody[key] = vals
-					}
-				}
-			}
-		}
+		requestBody := parseRequestBody(c, logger)
 
 		customWriter := &CustomResponseWriter{
 			ResponseWriter: c.Writer,
@@ -104,48 +80,149 @@ func Logger() gin.HandlerFunc {
 
 		statusCode := c.Writer.Status()
 
-		responseContentType := c.Writer.Header().Get("Content-Type")
-		responseBodyRaw := customWriter.body.String()
-		var responseBody any
+		responseBody := parseResponseBody(c.Writer.Header().Get("Content-Type"), customWriter.body.Bytes())
+		logEntry := buildLogEntry(c, statusCode, duration, requestBody, responseBody)
 
-		if strings.HasPrefix(responseContentType, "image/") || strings.HasPrefix(responseContentType, "application/octet-stream") {
-			responseBody = fmt.Sprintf("[Binary data of type %s, size %s]", responseContentType, formatFileSize(int64(customWriter.body.Len())))
-		} else if strings.HasPrefix(responseContentType, "application/json") ||
-			strings.HasPrefix(responseContentType, "text/") ||
-			strings.HasPrefix(strings.TrimSpace(responseBodyRaw), "{") ||
-			strings.HasPrefix(strings.TrimSpace(responseBodyRaw), "[") {
-			if err := json.Unmarshal(customWriter.body.Bytes(), &responseBody); err != nil {
-				responseBody = responseBodyRaw
-			}
-		} else {
-			responseBody = responseBodyRaw
-			if len(responseBodyRaw) > 1000 {
-				responseBody = fmt.Sprintf("%s... [truncated, total %d bytes]", responseBodyRaw[:1000], len(responseBodyRaw))
-			}
-		}
-
-		logEvent := logger.Info()
-		if statusCode >= 500 {
-			logEvent = logger.Error()
-		} else if statusCode >= 400 {
-			logEvent = logger.Warn()
-		}
-
-		logEvent.Str("protocol", c.Request.Proto).
-			Str("method", c.Request.Method).
-			Str("path", c.Request.URL.Path).
-			Str("query", c.Request.URL.RawQuery).
-			Str("client_ip", c.ClientIP()).
-			Str("user_agent", c.Request.UserAgent()).
-			Str("referer", c.Request.Referer()).
-			Int("status", statusCode).
-			Str("remote_address", c.Request.RemoteAddr).
-			Str("headers", fmt.Sprint(c.Request.Header)).
-			Interface("request_body", requestBody).
-			Interface("response_body", responseBody).
-			Int64("duration_ms", duration.Milliseconds()).
-			Msg("HTTP request")
+		logEvent := getLoggerEvent(statusCode, logger)
+		writeLogEvent(logEvent, logEntry)
 	}
+}
+
+func buildLogEntry(c *gin.Context, statusCode int, duration time.Duration, requestBody map[string]any, responseBody any) LogEntry {
+	return LogEntry{
+		Protocol:      c.Request.Proto,
+		Method:        c.Request.Method,
+		Path:          c.Request.URL.Path,
+		Query:         c.Request.URL.RawQuery,
+		ClientIP:      c.ClientIP(),
+		UserAgent:     c.Request.UserAgent(),
+		Referer:       c.Request.Referer(),
+		Status:        statusCode,
+		RemoteAddress: c.Request.RemoteAddr,
+		Headers:       c.Request.Header,
+		RequestBody:   requestBody,
+		ResponseBody:  responseBody,
+		DurationMs:    duration.Milliseconds(),
+		Timestamp:     time.Now(),
+	}
+}
+
+func writeLogEvent(logEvent *zerolog.Event, entry LogEntry) {
+	logEvent.Str("protocol", entry.Protocol).
+		Str("method", entry.Method).
+		Str("path", entry.Path).
+		Str("query", entry.Query).
+		Str("client_ip", entry.ClientIP).
+		Str("user_agent", entry.UserAgent).
+		Str("referer", entry.Referer).
+		Int("status", entry.Status).
+		Str("remote_address", entry.RemoteAddress).
+		Interface("headers", entry.Headers).
+		Interface("request_body", entry.RequestBody).
+		Interface("response_body", entry.ResponseBody).
+		Int64("duration_ms", entry.DurationMs).
+		Time("timestamp", entry.Timestamp).
+		Msg("HTTP request")
+}
+
+func getLoggerEvent(statusCode int, logger zerolog.Logger) *zerolog.Event {
+	if statusCode >= 500 {
+		return logger.Error()
+	} else if statusCode >= 400 {
+		return logger.Warn()
+	} else {
+		return logger.Info()
+	}
+}
+
+func parseRequestBody(c *gin.Context, logger zerolog.Logger) map[string]any {
+	contentType := c.GetHeader("Content-Type")
+	requestBody := make(map[string]any)
+	var formFiles []map[string]any
+
+	if strings.HasPrefix(contentType, "multipart/form-data") {
+		if err := c.Request.ParseMultipartForm(multipartMaxMemory); err != nil {
+			logger.Error().Err(err).Msg("Failed to parse multipart form")
+			return requestBody
+		}
+
+		if c.Request.MultipartForm != nil {
+			for key, vals := range c.Request.MultipartForm.Value {
+				if len(vals) == 1 {
+					requestBody[key] = vals[0]
+				} else {
+					requestBody[key] = vals
+				}
+			}
+
+			for field, files := range c.Request.MultipartForm.File {
+				for _, fileHeader := range files {
+					formFiles = append(formFiles, map[string]any{
+						"field":        field,
+						"filename":     fileHeader.Filename,
+						"size":         formatFileSize(fileHeader.Size),
+						"content_type": fileHeader.Header.Get("Content-Type"),
+					})
+				}
+			}
+		}
+
+		if len(formFiles) > 0 {
+			requestBody["files"] = formFiles
+		}
+
+		return requestBody
+	}
+
+	bodyBytes, err := io.ReadAll(c.Request.Body)
+	if err != nil {
+		logger.Error().Err(err).Msg("Failed to read request body")
+		return requestBody
+	}
+
+	c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
+	if strings.HasPrefix(contentType, "application/json") {
+		_ = json.Unmarshal(bodyBytes, &requestBody)
+		return requestBody
+	}
+
+	values, _ := url.ParseQuery(string(bodyBytes))
+	for key, vals := range values {
+		if len(vals) == 1 {
+			requestBody[key] = vals[0]
+		} else {
+			requestBody[key] = vals
+		}
+	}
+
+	return requestBody
+}
+
+func parseResponseBody(contentType string, bodyBytes []byte) any {
+	responseBodyRaw := string(bodyBytes)
+
+	if strings.HasPrefix(contentType, "image/") || strings.HasPrefix(contentType, "application/octet-stream") {
+		return fmt.Sprintf("[Binary data of type %s, size %s]", contentType, formatFileSize(int64(len(bodyBytes))))
+	}
+
+	trimmedBody := strings.TrimSpace(responseBodyRaw)
+	if strings.HasPrefix(contentType, "application/json") ||
+		strings.HasPrefix(contentType, "text/") ||
+		strings.HasPrefix(trimmedBody, "{") ||
+		strings.HasPrefix(trimmedBody, "[") {
+		var parsedBody any
+		if err := json.Unmarshal(bodyBytes, &parsedBody); err != nil {
+			return responseBodyRaw
+		}
+		return parsedBody
+	}
+
+	if len(responseBodyRaw) > responsePreviewLimit {
+		return fmt.Sprintf("%s... [truncated, total %d bytes]", responseBodyRaw[:responsePreviewLimit], len(responseBodyRaw))
+	}
+
+	return responseBodyRaw
 }
 
 func formatFileSize(size int64) string {
