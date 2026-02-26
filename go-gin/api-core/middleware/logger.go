@@ -6,28 +6,36 @@ import (
 	"fmt"
 	"io"
 	"net/url"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
+
+type CustomResponseWriter struct {
+	gin.ResponseWriter
+	body *bytes.Buffer
+}
+
+func (w *CustomResponseWriter) Write(b []byte) (int, error) {
+	w.body.Write(b)
+	return w.ResponseWriter.Write(b)
+}
 
 func Logger() gin.HandlerFunc {
 	logPath := filepath.Join("logs", "http.log")
 
-	if err := os.MkdirAll(filepath.Dir(logPath), os.ModePerm); err != nil {
-		panic("Failed to create log directory: " + err.Error())
-	}
-
-	fileLog, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
-	if err != nil {
-		panic("Failed to open log file: " + err.Error())
-	}
-
-	logger := zerolog.New(fileLog).With().Timestamp().Logger()
+	logger := zerolog.New(&lumberjack.Logger{
+		Filename:   logPath,
+		MaxSize:    1, // megabytes
+		MaxBackups: 5,
+		MaxAge:     5,    //days
+		Compress:   true, // disabled by default
+		LocalTime:  true,
+	}).With().Timestamp().Logger()
 
 	return func(c *gin.Context) {
 
@@ -84,11 +92,37 @@ func Logger() gin.HandlerFunc {
 			}
 		}
 
+		customWriter := &CustomResponseWriter{
+			ResponseWriter: c.Writer,
+			body:           bytes.NewBuffer(nil),
+		}
+		c.Writer = customWriter
+
 		c.Next()
 
 		duration := time.Since(start)
 
 		statusCode := c.Writer.Status()
+
+		responseContentType := c.Writer.Header().Get("Content-Type")
+		responseBodyRaw := customWriter.body.String()
+		var responseBody any
+
+		if strings.HasPrefix(responseContentType, "image/") || strings.HasPrefix(responseContentType, "application/octet-stream") {
+			responseBody = fmt.Sprintf("[Binary data of type %s, size %s]", responseContentType, formatFileSize(int64(customWriter.body.Len())))
+		} else if strings.HasPrefix(responseContentType, "application/json") ||
+			strings.HasPrefix(responseContentType, "text/") ||
+			strings.HasPrefix(strings.TrimSpace(responseBodyRaw), "{") ||
+			strings.HasPrefix(strings.TrimSpace(responseBodyRaw), "[") {
+			if err := json.Unmarshal(customWriter.body.Bytes(), &responseBody); err != nil {
+				responseBody = responseBodyRaw
+			}
+		} else {
+			responseBody = responseBodyRaw
+			if len(responseBodyRaw) > 1000 {
+				responseBody = fmt.Sprintf("%s... [truncated, total %d bytes]", responseBodyRaw[:1000], len(responseBodyRaw))
+			}
+		}
 
 		logEvent := logger.Info()
 		if statusCode >= 500 {
@@ -108,6 +142,7 @@ func Logger() gin.HandlerFunc {
 			Str("remote_address", c.Request.RemoteAddr).
 			Str("headers", fmt.Sprint(c.Request.Header)).
 			Interface("request_body", requestBody).
+			Interface("response_body", responseBody).
 			Int64("duration_ms", duration.Milliseconds()).
 			Msg("HTTP request")
 	}

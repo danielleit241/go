@@ -1,0 +1,21 @@
+{
+  "level": "warn",
+  "protocol": "HTTP/1.0",
+  "method": "GET",
+  "path": "/api/v1/users/",
+  "query": "",
+  "client_ip": "::1",
+  "user_agent": "ApacheBench/2.3",
+  "referer": "",
+  "status": 429,
+  "remote_address": "[::1]:59416",
+  "headers": "map[Accept:[*/*] User-Agent:[ApacheBench/2.3]]",
+  "request_body": {},
+  "response_body": {
+    "error": "Too many requests",
+    "retry_after": 46
+  },
+  "duration_ms": 0,
+  "time": "2026-02-26T10:47:34+07:00",
+  "message": "HTTP request"
+}
