@@ -12,7 +12,7 @@ import (
 func main() {
 	cfg := config.NewConfig()
 
-	userRepo := repository.NewUserInMemoryRepository()
+	userRepo := repository.NewInMemoryUserRepository()
 	userService := service.NewUserService(userRepo)
 	userHandler := handler.NewUserHandler(userService)
 	userRoutes := routers.NewUserRoutes(userHandler)
