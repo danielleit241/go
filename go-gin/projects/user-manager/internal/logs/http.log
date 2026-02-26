@@ -1,1 +1,68 @@
-
+{
+  "level": "info",
+  "protocol": "HTTP/1.1",
+  "method": "POST",
+  "path": "/api/v1/users/",
+  "query": "",
+  "client_ip": "127.0.0.1",
+  "user_agent": "PostmanRuntime/7.51.1",
+  "referer": "http://127.0.0.1:8080/api/v1/users",
+  "status": 200,
+  "remote_address": "127.0.0.1:61375",
+  "headers": {
+    "Accept": [
+      "*/*"
+    ],
+    "Accept-Encoding": [
+      "gzip, deflate, br"
+    ],
+    "Cache-Control": [
+      "no-cache"
+    ],
+    "Connection": [
+      "keep-alive"
+    ],
+    "Content-Length": [
+      "151"
+    ],
+    "Content-Type": [
+      "application/json"
+    ],
+    "Postman-Token": [
+      "679d7e90-2ed1-4efe-b056-bfabbf18ea53"
+    ],
+    "Referer": [
+      "http://127.0.0.1:8080/api/v1/users"
+    ],
+    "User-Agent": [
+      "PostmanRuntime/7.51.1"
+    ],
+    "X-Api-Key": [
+      "test-api-key"
+    ]
+  },
+  "request_body": {
+    "age": 19,
+    "email": "charlie.brown@example.com",
+    "level": 1,
+    "name": "Charlie Brown",
+    "password": "charlie123",
+    "status": 1
+  },
+  "response_body": {
+    "data": {
+      "age": 19,
+      "email": "charlie.brown@example.com",
+      "id": "d83e36ad-7667-4989-972b-b305a3d0f2f9",
+      "level": 1,
+      "name": "Charlie Brown",
+      "password": "$2a$10$uXSH.nzM/3ZrsAI0avQtkeWun/8k1vWoIIg7/gyOXBzTBSTvikBby",
+      "status": 1
+    },
+    "status": "success"
+  },
+  "duration_ms": 54,
+  "timestamp": "2026-02-26T22:02:17+07:00",
+  "time": "2026-02-26T22:02:17+07:00",
+  "message": "HTTP request"
+}

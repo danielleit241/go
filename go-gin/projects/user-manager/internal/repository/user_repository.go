@@ -21,7 +21,8 @@ func (repo *inMemoryUserRepository) FindById(id int) (*models.User, error) {
 }
 
 func (repo *inMemoryUserRepository) Create(user models.User) (*models.User, error) {
-	return nil, nil
+	repo.users = append(repo.users, user)
+	return &user, nil
 }
 
 func (repo *inMemoryUserRepository) Update(id int, user models.User) (*models.User, error) {
@@ -30,4 +31,13 @@ func (repo *inMemoryUserRepository) Update(id int, user models.User) (*models.Us
 
 func (repo *inMemoryUserRepository) Delete(id int) error {
 	return nil
+}
+
+func (repo *inMemoryUserRepository) IsEmailExists(email string) bool {
+	for _, user := range repo.users {
+		if user.Email == email {
+			return true
+		}
+	}
+	return false
 }

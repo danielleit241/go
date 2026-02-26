@@ -1,7 +1,12 @@
 package handler
 
 import (
+	"net/http"
+
+	"github.com/danielleit241/internal/models"
 	"github.com/danielleit241/internal/service"
+	"github.com/danielleit241/internal/utils"
+	"github.com/danielleit241/internal/validation"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,13 +21,24 @@ func NewUserHandler(userService service.UserService) *UserHandler {
 }
 
 func (uh *UserHandler) GetAllUsers(c *gin.Context) {
-	uh.userService.GetAllUsers()
 }
 
 func (uh *UserHandler) GetUserByID(c *gin.Context) {
 }
 
 func (uh *UserHandler) CreateUser(c *gin.Context) {
+	var user models.User
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, validation.HandleValidationError(err))
+		return
+	}
+
+	createdUser, err := uh.userService.CreateUser(user)
+	if err != nil {
+		utils.ResponseError(c, err)
+		return
+	}
+	utils.ResponseSuccess(c, createdUser, "user created successfully")
 }
 
 func (uh *UserHandler) UpdateUser(c *gin.Context) {

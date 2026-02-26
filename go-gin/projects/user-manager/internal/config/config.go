@@ -7,7 +7,7 @@ type Config struct {
 
 func NewConfig() *Config {
 	return &Config{
-		ServerPort: ":8080",
+		ServerPort: "127.0.0.1:8080",
 		ApiPrefix:  "/api/v1",
 	}
 }
