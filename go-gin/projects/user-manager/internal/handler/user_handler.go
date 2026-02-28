@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 
+	"github.com/danielleit241/internal/dto"
 	"github.com/danielleit241/internal/models"
 	"github.com/danielleit241/internal/service"
 	"github.com/danielleit241/internal/utils"
@@ -38,7 +39,10 @@ func (uh *UserHandler) CreateUser(c *gin.Context) {
 		utils.ResponseError(c, err)
 		return
 	}
-	utils.ResponseSuccess(c, createdUser, "user created successfully")
+
+	response := dto.MapUserToResponse(createdUser)
+
+	utils.ResponseSuccess(c, response, "user created successfully")
 }
 
 func (uh *UserHandler) UpdateUser(c *gin.Context) {

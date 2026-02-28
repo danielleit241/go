@@ -43,6 +43,12 @@ var validationErrorMessages = map[string]ErrorMessageFunc{
 	"date": func(field, tag, param string) string {
 		return fmt.Sprintf("%s must be a valid date in the format %s", field, param)
 	},
+	"blocked_email_domain": func(field, tag, param string) string {
+		return fmt.Sprintf("%s is not allowed to be from a blocked email domain", field)
+	},
+	"strong_password": func(field, tag, param string) string {
+		return fmt.Sprintf("%s must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character", field)
+	},
 }
 
 func Initialize() error {
