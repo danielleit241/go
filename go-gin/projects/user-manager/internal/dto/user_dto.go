@@ -35,6 +35,26 @@ func ToResponses(users []models.User) []UserResponse {
 	return userResponses
 }
 
+type PageResponse[T any] struct {
+	Items []T `json:"items"`
+	Total int `json:"total"`
+	Page  int `json:"page,omitempty"`
+	Limit int `json:"limit,omitempty"`
+}
+
+func ToPageResponse(users []models.User, total int, page, limit int) *PageResponse[UserResponse] {
+	userResponses := make([]UserResponse, 0, len(users))
+	for _, user := range users {
+		userResponses = append(userResponses, *ToResponse(&user))
+	}
+	return &PageResponse[UserResponse]{
+		Items: userResponses,
+		Total: total,
+		Page:  page,
+		Limit: limit,
+	}
+}
+
 func getStringStatus(status int) string {
 	if status == 1 {
 		return "active"

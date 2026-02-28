@@ -2,6 +2,7 @@ package validation
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 	"unicode"
 
@@ -23,6 +24,10 @@ var customValidations = []CustomValidation{
 	{
 		Tag: "strong_password",
 		Fn:  validateStrongPassword,
+	},
+	{
+		Tag: "search",
+		Fn:  validateSearchQuery,
 	},
 }
 
@@ -69,4 +74,10 @@ func validateStrongPassword(fl validator.FieldLevel) bool {
 	}) >= 0
 
 	return hasMinLength && hasUpper && hasLower && hasNumber && hasSpecial
+}
+
+func validateSearchQuery(fl validator.FieldLevel) bool {
+	searchRegex := regexp.MustCompile(`^[a-zA-Z0-9\s]*$`)
+	query := fl.Field().String()
+	return searchRegex.MatchString(query)
 }

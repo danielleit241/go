@@ -20,14 +20,28 @@ func NewUserHandler(userService service.UserService) *UserHandler {
 	}
 }
 
+type GetAllUsersRequest struct {
+	Query string `form:"query" binding:"omitempty,search"`
+	Page  *int   `form:"page" binding:"omitempty,gt=0"`
+	Limit *int   `form:"limit" binding:"omitempty,gt=0,lte=100"`
+}
+
 func (uh *UserHandler) GetAllUsers(c *gin.Context) {
-	users, err := uh.userService.GetAllUsers()
+	var req GetAllUsersRequest
+	if err := c.ShouldBindQuery(&req); err != nil {
+		utils.ResponseValidationError(c, validation.HandleValidationError(err))
+		return
+	}
+
+	page, limit := utils.NormalizePaginationParams(req.Page, req.Limit)
+
+	users, total, err := uh.userService.GetAllUsersWithPagination(req.Query, page, limit)
 	if err != nil {
 		utils.ResponseError(c, err)
 		return
 	}
 
-	responses := dto.ToResponses(users)
+	responses := dto.ToPageResponse(users, total, page, limit)
 
 	utils.ResponseSuccess(c, responses, "users retrieved successfully")
 }

@@ -7,6 +7,7 @@ import (
 
 type UserRepository interface {
 	FindAll() ([]models.User, error)
+	FindAllWithPagination(query string, page, limit int) ([]models.User, int, error)
 	FindById(id uuid.UUID) (*models.User, error)
 	Create(user models.User) (*models.User, error)
 	Update(id int, user models.User) (*models.User, error)

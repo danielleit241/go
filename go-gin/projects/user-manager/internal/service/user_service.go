@@ -20,6 +20,14 @@ func NewUserService(inMemoryRepo repository.UserRepository) UserService {
 	}
 }
 
+func (us *userService) GetAllUsersWithPagination(query string, page, limit int) (data []models.User, total int, err error) {
+	users, total, err := us.inMemoryRepo.FindAllWithPagination(query, page, limit)
+	if err != nil {
+		return nil, 0, utils.WrapError("failed to retrieve users with pagination", utils.ErrCodeInternalServerError, err)
+	}
+	return users, total, nil
+}
+
 func (us *userService) GetAllUsers() ([]models.User, error) {
 	users, err := us.inMemoryRepo.FindAll()
 	if err != nil {
