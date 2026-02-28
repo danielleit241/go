@@ -49,8 +49,8 @@ func (us *userService) GetUserByID(id uuid.UUID) (*models.User, error) {
 func (us *userService) CreateUser(user models.User) (*models.User, error) {
 	user.Email = utils.NormalizeString(user.Email)
 
-	existingUser := us.inMemoryRepo.IsEmailExists(user.Email)
-	if existingUser {
+	_, isExists := us.inMemoryRepo.IsEmailExists(user.Email)
+	if isExists {
 		message := fmt.Sprintf("email [%s] already exists", user.Email)
 		return nil, utils.NewError(message, utils.ErrCodeConflict)
 	}
@@ -70,10 +70,35 @@ func (us *userService) CreateUser(user models.User) (*models.User, error) {
 	return createdUser, nil
 }
 
-func (us *userService) UpdateUser(id int, user models.User) (*models.User, error) {
-	return nil, nil
+func (us *userService) UpdateUser(id uuid.UUID, user models.User) (*models.User, error) {
+	user.Email = utils.NormalizeString(user.Email)
+
+	existingUser, isExists := us.inMemoryRepo.IsEmailExists(user.Email)
+	if isExists && existingUser.ID != id {
+		message := fmt.Sprintf("email [%s] already exists", user.Email)
+		return nil, utils.NewError(message, utils.ErrCodeConflict)
+	}
+
+	if user.Password != "" {
+		bcryptPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+		if err != nil {
+			return nil, utils.WrapError("failed to hash password", utils.ErrCodeInternalServerError, err)
+		}
+		user.Password = string(bcryptPassword)
+	}
+
+	updatedUser, err := us.inMemoryRepo.Update(id, user)
+	if err != nil {
+		return nil, utils.WrapError(fmt.Sprintf("failed to update user with id [%s]", id), utils.ErrCodeInternalServerError, err)
+	}
+
+	return updatedUser, nil
 }
 
-func (us *userService) DeleteUser(id int) error {
+func (us *userService) DeleteUser(id uuid.UUID) error {
+	err := us.inMemoryRepo.Delete(id)
+	if err != nil {
+		return utils.WrapError(fmt.Sprintf("failed to delete user with id [%s]", id), utils.ErrCodeInternalServerError, err)
+	}
 	return nil
 }

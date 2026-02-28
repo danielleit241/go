@@ -31,14 +31,35 @@ func ResponseError(c *gin.Context, err error) {
 	c.JSON(http.StatusInternalServerError, NewError("internal server error", ErrCodeInternalServerError))
 }
 
-func ResponseSuccess(c *gin.Context, data any, message string) {
+func ResponseSuccess(c *gin.Context, statusCode int, data any, message string) {
 	if message == "" {
 		message = "success"
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	defaultStatusCode := http.StatusOK
+	if statusCode != 0 {
+		defaultStatusCode = statusCode
+	}
+
+	c.JSON(defaultStatusCode, gin.H{
 		"message": message,
 		"status":  "success",
 		"data":    data,
+	})
+}
+
+func ResponseSuccessWithPage[T any](c *gin.Context, message string, total, page, limit int, items []T) {
+	if message == "" {
+		message = "success"
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": message,
+		"status":  "success",
+		"data": gin.H{
+			"total": total,
+			"page":  page,
+			"limit": limit,
+			"items": items,
+		},
 	})
 }

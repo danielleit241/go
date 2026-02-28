@@ -14,6 +14,24 @@ type UserResponse struct {
 	Level  string    `json:"level"`
 }
 
+type UserCreateRequest struct {
+	Name     string `json:"name" binding:"required,min=2,max=100"`
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required,min=6,max=100"`
+	Age      int    `json:"age" binding:"required,gt=0"`
+	Status   int    `json:"status" binding:"required,oneof=0 1"`
+	Level    int    `json:"level" binding:"required,oneof=1 2"`
+}
+
+type UserUpdateRequest struct {
+	Name     string `json:"name" binding:"omitempty,min=2,max=100"`
+	Email    string `json:"email" binding:"omitempty,email"`
+	Password string `json:"password" binding:"omitempty,min=6,max=100"`
+	Age      int    `json:"age" binding:"omitempty,gt=0"`
+	Status   int    `json:"status" binding:"omitempty,oneof=0 1"`
+	Level    int    `json:"level" binding:"omitempty,oneof=1 2"`
+}
+
 func ToResponse(user *models.User) *UserResponse {
 	return &UserResponse{
 		ID:     user.ID,
@@ -35,23 +53,25 @@ func ToResponses(users []models.User) []UserResponse {
 	return userResponses
 }
 
-type PageResponse[T any] struct {
-	Items []T `json:"items"`
-	Total int `json:"total"`
-	Page  int `json:"page,omitempty"`
-	Limit int `json:"limit,omitempty"`
+func (request *UserCreateRequest) ToEntity(req UserCreateRequest) models.User {
+	return models.User{
+		Name:     req.Name,
+		Email:    req.Email,
+		Password: req.Password,
+		Age:      req.Age,
+		Status:   req.Status,
+		Level:    req.Level,
+	}
 }
 
-func ToPageResponse(users []models.User, total int, page, limit int) *PageResponse[UserResponse] {
-	userResponses := make([]UserResponse, 0, len(users))
-	for _, user := range users {
-		userResponses = append(userResponses, *ToResponse(&user))
-	}
-	return &PageResponse[UserResponse]{
-		Items: userResponses,
-		Total: total,
-		Page:  page,
-		Limit: limit,
+func (request *UserUpdateRequest) ToEntity(req UserUpdateRequest) models.User {
+	return models.User{
+		Name:     req.Name,
+		Email:    req.Email,
+		Password: req.Password,
+		Age:      req.Age,
+		Status:   req.Status,
+		Level:    req.Level,
 	}
 }
 

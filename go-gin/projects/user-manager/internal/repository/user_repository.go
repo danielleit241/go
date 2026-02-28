@@ -1,6 +1,9 @@
 package repository
 
 import (
+	"slices"
+	"strings"
+
 	"github.com/danielleit241/internal/models"
 	"github.com/danielleit241/internal/utils"
 	"github.com/google/uuid"
@@ -49,12 +52,12 @@ func (repo *inMemoryUserRepository) FindAllWithPagination(query string, page, li
 }
 
 func (repo *inMemoryUserRepository) FindById(id uuid.UUID) (*models.User, error) {
-	for _, user := range repo.users {
-		if user.ID == id {
-			return &user, nil
+	for i := range repo.users {
+		if repo.users[i].ID == id {
+			return &repo.users[i], nil
 		}
 	}
-	return nil, nil
+	return nil, utils.WrapError("failed to find user by id", utils.ErrCodeNotFound, nil)
 }
 
 func (repo *inMemoryUserRepository) Create(user models.User) (*models.User, error) {
@@ -62,19 +65,46 @@ func (repo *inMemoryUserRepository) Create(user models.User) (*models.User, erro
 	return &user, nil
 }
 
-func (repo *inMemoryUserRepository) Update(id int, user models.User) (*models.User, error) {
-	return nil, nil
+func (repo *inMemoryUserRepository) Update(id uuid.UUID, user models.User) (*models.User, error) {
+	updated, err := repo.FindById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if user.Name != "" {
+		updated.Name = strings.TrimSpace(user.Name)
+	}
+	if user.Email != "" {
+		updated.Email = utils.NormalizeString(user.Email)
+	}
+	if user.Age != 0 {
+		updated.Age = user.Age
+	}
+	if user.Status != 0 {
+		updated.Status = user.Status
+	}
+	if user.Level != 0 {
+		updated.Level = user.Level
+	}
+
+	return updated, nil
 }
 
-func (repo *inMemoryUserRepository) Delete(id int) error {
-	return nil
-}
-
-func (repo *inMemoryUserRepository) IsEmailExists(email string) bool {
-	for _, user := range repo.users {
-		if user.Email == email {
-			return true
+func (repo *inMemoryUserRepository) Delete(id uuid.UUID) error {
+	for i := range repo.users {
+		if repo.users[i].ID == id {
+			repo.users = slices.Delete(repo.users, i, i+1)
+			return nil
 		}
 	}
-	return false
+	return utils.WrapError("failed to delete user", utils.ErrCodeNotFound, nil)
+}
+
+func (repo *inMemoryUserRepository) IsEmailExists(email string) (*models.User, bool) {
+	for _, user := range repo.users {
+		if user.Email == email {
+			return &user, true
+		}
+	}
+	return nil, false
 }
