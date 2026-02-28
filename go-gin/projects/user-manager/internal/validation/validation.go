@@ -1,6 +1,7 @@
 package validation
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -63,9 +64,9 @@ func Initialize() error {
 }
 
 func HandleValidationError(err error) gin.H {
-	validErr, ok := err.(validator.ValidationErrors)
-	if !ok {
-		return gin.H{"error": "Invalid error type"}
+	var validErr validator.ValidationErrors
+	if !errors.As(err, &validErr) {
+		return gin.H{"error": err.Error()}
 	}
 
 	errorMessages := make(map[string]string, len(validErr))

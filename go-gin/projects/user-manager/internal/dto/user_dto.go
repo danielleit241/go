@@ -14,7 +14,7 @@ type UserResponse struct {
 	Level  string    `json:"level"`
 }
 
-func MapUserToResponse(user *models.User) *UserResponse {
+func ToResponse(user *models.User) *UserResponse {
 	return &UserResponse{
 		ID:     user.ID,
 		Name:   user.Name,
@@ -23,6 +23,16 @@ func MapUserToResponse(user *models.User) *UserResponse {
 		Status: getStringStatus(user.Status),
 		Level:  getStringLevel(user.Level),
 	}
+}
+
+func ToResponses(users []models.User) []UserResponse {
+	userResponses := make([]UserResponse, 0, len(users))
+
+	for _, user := range users {
+		userResponses = append(userResponses, *ToResponse(&user))
+	}
+
+	return userResponses
 }
 
 func getStringStatus(status int) string {

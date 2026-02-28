@@ -6,6 +6,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func ResponseValidationError(c *gin.Context, data any) {
+	c.JSON(http.StatusBadRequest, data)
+}
+
 func ResponseError(c *gin.Context, err error) {
 	if appErr, ok := err.(*AppError); ok {
 		switch appErr.Code {

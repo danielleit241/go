@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/danielleit241/internal/models"
 	"github.com/danielleit241/internal/repository"
 	"github.com/danielleit241/internal/utils"
@@ -19,11 +21,21 @@ func NewUserService(inMemoryRepo repository.UserRepository) UserService {
 }
 
 func (us *userService) GetAllUsers() ([]models.User, error) {
-	return []models.User{}, nil
+	users, err := us.inMemoryRepo.FindAll()
+	if err != nil {
+		return nil, utils.WrapError("failed to retrieve users", utils.ErrCodeInternalServerError, err)
+	}
+
+	return users, nil
 }
 
-func (us *userService) GetUserByID(id int) (*models.User, error) {
-	return nil, nil
+func (us *userService) GetUserByID(id uuid.UUID) (*models.User, error) {
+	user, err := us.inMemoryRepo.FindById(id)
+	if err != nil {
+		return nil, utils.WrapError(fmt.Sprintf("failed to retrieve user with id [%s]", id), utils.ErrCodeInternalServerError, err)
+	}
+
+	return user, nil
 }
 
 func (us *userService) CreateUser(user models.User) (*models.User, error) {
@@ -31,7 +43,8 @@ func (us *userService) CreateUser(user models.User) (*models.User, error) {
 
 	existingUser := us.inMemoryRepo.IsEmailExists(user.Email)
 	if existingUser {
-		return nil, utils.NewError("email already exist", utils.ErrCodeConflict)
+		message := fmt.Sprintf("email [%s] already exists", user.Email)
+		return nil, utils.NewError(message, utils.ErrCodeConflict)
 	}
 
 	user.ID = uuid.New()

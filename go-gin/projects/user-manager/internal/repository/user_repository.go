@@ -1,6 +1,9 @@
 package repository
 
-import "github.com/danielleit241/internal/models"
+import (
+	"github.com/danielleit241/internal/models"
+	"github.com/google/uuid"
+)
 
 type inMemoryUserRepository struct {
 	users []models.User
@@ -16,7 +19,12 @@ func (repo *inMemoryUserRepository) FindAll() ([]models.User, error) {
 	return repo.users, nil
 }
 
-func (repo *inMemoryUserRepository) FindById(id int) (*models.User, error) {
+func (repo *inMemoryUserRepository) FindById(id uuid.UUID) (*models.User, error) {
+	for _, user := range repo.users {
+		if user.ID == id {
+			return &user, nil
+		}
+	}
 	return nil, nil
 }
 

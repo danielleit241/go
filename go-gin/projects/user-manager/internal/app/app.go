@@ -1,6 +1,10 @@
 package app
 
 import (
+	"log"
+	"os"
+	"path/filepath"
+
 	"github.com/danielleit241/internal/config"
 	routers "github.com/danielleit241/internal/routes"
 	"github.com/danielleit241/internal/validation"
@@ -51,7 +55,28 @@ func getModuleRoutes(modules []Module) []routers.Route {
 }
 
 func loadEnv() {
-	if err := godotenv.Load("../../.env"); err != nil {
-		panic("Failed to load environment variables: " + err.Error())
+	currentDir, err := os.Getwd()
+	if err != nil {
+		log.Printf("failed to get current working directory, skip loading .env: %v", err)
+		return
 	}
+
+	dir := currentDir
+	for {
+		envPath := filepath.Join(dir, ".env")
+		if _, statErr := os.Stat(envPath); statErr == nil {
+			if loadErr := godotenv.Load(envPath); loadErr != nil {
+				log.Printf("failed to load .env file at %s: %v", envPath, loadErr)
+			}
+			return
+		}
+
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			break
+		}
+		dir = parent
+	}
+
+	log.Println(".env file not found, using existing system environment variables")
 }
