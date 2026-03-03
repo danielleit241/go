@@ -24,7 +24,7 @@ func main() {
 
 	r := gin.Default()
 
-	userRepo := repository.NewUserRepository()
+	userRepo := repository.NewUserRepository(db.DB)
 	userHandler := handler.NewUserHandler(userRepo)
 
 	r.GET("/api/v1/users/:id", userHandler.GetUser)
