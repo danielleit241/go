@@ -16,15 +16,17 @@ type DatabaseConfig struct {
 }
 
 type Config struct {
-	ServerPort string
-	ApiPrefix  string
-	Database   DatabaseConfig
+	Environment string
+	ServerPort  string
+	ApiPrefix   string
+	Database    DatabaseConfig
 }
 
 func NewConfig() *Config {
 	return &Config{
-		ServerPort: "127.0.0.1:8080",
-		ApiPrefix:  "/api/v1",
+		Environment: utils.GetEnvOrDefault("ENVIRONMENT", "development"),
+		ServerPort:  utils.GetEnvOrDefault("SERVER_PORT", ":8080"),
+		ApiPrefix:   utils.GetEnvOrDefault("API_PREFIX", "/api/v1"),
 		Database: DatabaseConfig{
 			Host:     utils.GetEnvOrDefault("DB_HOST", "localhost"),
 			Port:     utils.GetEnvOrDefault("DB_PORT", "5432"),

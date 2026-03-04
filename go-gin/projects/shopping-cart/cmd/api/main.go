@@ -6,6 +6,8 @@ import (
 )
 
 func main() {
+	app.LoadEnv()
+
 	cfg := config.NewConfig()
 
 	application := app.NewApplication(cfg)

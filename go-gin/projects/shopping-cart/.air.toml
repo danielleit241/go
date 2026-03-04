@@ -11,6 +11,8 @@ tmp_dir = "tmp"
   include_ext = ["go"]
   exclude_dir = ["assets", "tmp", "vendor", "testdata"]
   exclude_regex = ["_test.go"]
+  send_interrupt = true
+  kill_delay = "3s"
   
 [color]
   app = ""

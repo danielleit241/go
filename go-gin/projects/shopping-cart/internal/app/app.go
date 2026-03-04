@@ -32,13 +32,11 @@ func NewApplication(config *config.Config) *Application {
 
 	validation.Initialize()
 
-	loadEnv()
-
 	modules := []Module{
 		NewUserModule(),
 	}
 
-	routers.RegisterRoutes(r, getModuleRoutes(modules)...)
+	routers.RegisterRoutes(r, config, getModuleRoutes(modules)...)
 
 	return &Application{
 		config:  config,
@@ -87,7 +85,7 @@ func getModuleRoutes(modules []Module) []routers.Route {
 	return routes
 }
 
-func loadEnv() {
+func LoadEnv() {
 	currentDir, err := os.Getwd()
 	if err != nil {
 		log.Printf("failed to get current working directory, skip loading .env: %v", err)
