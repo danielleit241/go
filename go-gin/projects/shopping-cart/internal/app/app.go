@@ -1,9 +1,14 @@
 package app
 
 import (
+	"context"
 	"log"
+	"net/http"
 	"os"
+	"os/signal"
 	"path/filepath"
+	"syscall"
+	"time"
 
 	"github.com/danielleit241/internal/config"
 	routers "github.com/danielleit241/internal/routes"
@@ -43,7 +48,35 @@ func NewApplication(config *config.Config) *Application {
 }
 
 func (app *Application) Run() error {
-	return app.router.Run(app.config.ServerPort)
+	serv := &http.Server{
+		Addr:    app.config.ServerPort,
+		Handler: app.router,
+	}
+
+	quitCh := make(chan os.Signal, 1)
+
+	signal.Notify(quitCh, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+	// syscall.SIGINT: Ctrl+C
+	// syscall.SIGTERM: Kill
+	// syscall.SIGHUP: Reload
+
+	go func() {
+		log.Printf("Server is running on %s", app.config.ServerPort)
+		if err := serv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("Failed to start server: %v", err)
+		}
+	}()
+
+	<-quitCh
+	log.Println("Shutting down server...")
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second) // 15 seconds timeout for graceful shutdown
+	defer cancel()
+	if err := serv.Shutdown(ctx); err != nil {
+		log.Fatalf("Server forced to shutdown: %v", err)
+	}
+
+	log.Println("Server exitted gracefully")
+	return nil
 }
 
 func getModuleRoutes(modules []Module) []routers.Route {
