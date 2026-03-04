@@ -36,11 +36,14 @@ func NewIPRateLimiter(r rate.Limit, b int, rateLimitLogger *zerolog.Logger) *IPR
 }
 
 func (i *IPRateLimiter) cleanup(rateLimitLogger *zerolog.Logger) {
-	for range time.Tick(1 * time.Minute) {
+	ticker := time.NewTicker(time.Minute)
+	defer ticker.Stop()
+
+	for range ticker.C {
 		i.mu.Lock()
 		for ip, c := range i.ips {
 			if time.Since(c.blockedAt) > 3*penaltyDuration && c.blockedAt.IsZero() == false {
-				rateLimitLogger.Info().Str("ip", ip).Msg("[Cleanup] Removing inactive IP")
+				rateLimitLogger.Warn().Str("ip", ip).Msg("[Cleanup] Removing inactive IP")
 				delete(i.ips, ip)
 			}
 		}
