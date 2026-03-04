@@ -1,0 +1,29 @@
+version: "2"
+
+sql:
+  - schema: "./internal/db/migrations"
+    queries: "./internal/db/queries"
+    engine: "postgresql"
+    gen:
+      go:
+        package: "sqlc"
+        out: "./internal/db/sqlc"
+        sql_package: "pgx/v5"
+        emit_json_tags: true # add json tags to struct fields
+        emit_interface: true # generate interfaces for all queries
+        emit_empty_slices: true # instead of null, return empty slices for array types
+        overrides: # override default type mappings of sql_package
+          - db_type: "uuid"
+            go_type:
+              import: "github.com/google/uuid"
+              type: "UUID"
+
+          - db_type: "timestamptz"
+            go_type:
+              import: "time"
+              type: "Time"
+          - db_type: "timestamptz"
+            go_type:
+              import: "time"
+              type: "Time"
+            nullable: true
