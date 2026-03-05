@@ -8,11 +8,21 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type User struct {
-	ID           uuid.UUID `json:"id"`
-	Name         string    `json:"name"`
-	Email        string    `json:"email"`
+	ID       uuid.UUID `json:"id"`
+	Name     string    `json:"name"`
+	Age      *int32    `json:"age"`
+	Email    string    `json:"email"`
+	Password string    `json:"password"`
+	// 0: inactive, 1: active
+	Status int32 `json:"status"`
+	// 0: user, 1: moderator, 2: admin
+	Role         int32     `json:"role"`
 	CreatedAtUtc time.Time `json:"created_at_utc"`
+	UpdatedAtUtc time.Time `json:"updated_at_utc"`
+	// Soft delete timestamp, null if not deleted
+	DeletedAtUtc pgtype.Timestamptz `json:"deleted_at_utc"`
 }

@@ -11,7 +11,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-var DB *sqlc.Queries
+var DB sqlc.Querier
 
 func InitDB(config *config.Config) error {
 	connectionString := config.GetDatabaseDSN()

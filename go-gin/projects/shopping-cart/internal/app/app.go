@@ -11,6 +11,8 @@ import (
 	"time"
 
 	"github.com/danielleit241/internal/config"
+	"github.com/danielleit241/internal/db"
+	"github.com/danielleit241/internal/db/sqlc"
 	routers "github.com/danielleit241/internal/routes"
 	"github.com/danielleit241/internal/validation"
 	"github.com/gin-gonic/gin"
@@ -27,13 +29,21 @@ type Application struct {
 	modules []Module
 }
 
+type ModuleContext struct {
+	DB sqlc.Querier
+}
+
 func NewApplication(config *config.Config) *Application {
 	r := gin.Default()
 
 	validation.Initialize()
 
+	ctx := &ModuleContext{
+		DB: db.DB,
+	}
+
 	modules := []Module{
-		NewUserModule(),
+		NewUserModule(ctx),
 	}
 
 	routers.RegisterRoutes(r, config, getModuleRoutes(modules)...)

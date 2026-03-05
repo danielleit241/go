@@ -7,43 +7,56 @@ package sqlc
 
 import (
 	"context"
-
-	"github.com/google/uuid"
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (name, email) VALUES ($1, $2) RETURNING id, name, email, created_at_utc
+INSERT INTO users (
+    name, 
+    email, 
+    password, 
+    age, 
+    status, 
+    role
+) VALUES (
+    $1,
+    $2,
+    $3,
+    $4,
+    $5,
+    $6
+) RETURNING id, name, age, email, password, status, role, created_at_utc, updated_at_utc, deleted_at_utc
 `
 
 type CreateUserParams struct {
-	Name  string `json:"name"`
-	Email string `json:"email"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Age      *int32 `json:"age"`
+	Status   int32  `json:"status"`
+	Role     int32  `json:"role"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRow(ctx, createUser, arg.Name, arg.Email)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.Email,
-		&i.CreatedAtUtc,
+	row := q.db.QueryRow(ctx, createUser,
+		arg.Name,
+		arg.Email,
+		arg.Password,
+		arg.Age,
+		arg.Status,
+		arg.Role,
 	)
-	return i, err
-}
-
-const getUserByID = `-- name: GetUserByID :one
-SELECT id, name, email, created_at_utc FROM users WHERE id = $1
-`
-
-func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
-	row := q.db.QueryRow(ctx, getUserByID, id)
 	var i User
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
+		&i.Age,
 		&i.Email,
+		&i.Password,
+		&i.Status,
+		&i.Role,
 		&i.CreatedAtUtc,
+		&i.UpdatedAtUtc,
+		&i.DeletedAtUtc,
 	)
 	return i, err
 }

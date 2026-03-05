@@ -57,7 +57,15 @@ func (uh *UserHandler) CreateUser(c *gin.Context) {
 		return
 	}
 
-	utils.ResponseSuccess(c, 201, nil, "user created successfully")
+	createdUser, err := uh.userService.CreateUser(c, user.ToCreateEntity())
+	if err != nil {
+		utils.ResponseError(c, err)
+		return
+	}
+
+	response := v1dto.ToResponse(createdUser)
+
+	utils.ResponseSuccess(c, 201, response, "user created successfully")
 }
 
 func (uh *UserHandler) UpdateUser(c *gin.Context) {

@@ -2,7 +2,7 @@ package utils
 
 import (
 	"regexp"
-	"strings"
+	"time"
 )
 
 var (
@@ -10,29 +10,34 @@ var (
 	matchAllCap   = regexp.MustCompile("([a-z0-9])([A-Z])")
 )
 
+const DateTimeFormat = "2006-01-02"
+
 func CamelCaseToSnakeCase(str string) string {
 	snake := matchFirstCap.ReplaceAllString(str, "${1}_${2}")
 	snake = matchAllCap.ReplaceAllString(snake, "${1}_${2}")
 	return snake
 }
 
-func NormalizeString(text string) string {
-	return strings.ToLower(strings.TrimSpace(text))
+func ConvertToInt32Ptr(i *int) *int32 {
+	if i == nil {
+		return nil
+	}
+	i32 := int32(*i)
+	return &i32
 }
 
-func NormalizePaginationParams(page, limit *int) (nP int, nL int) {
-	normalizedPage, normalizedLimit := 1, 10
-	if page != nil && *page > 0 {
-		normalizedPage = *page
+func ConvertInt32PtrToInt(i *int32) *int {
+	if i == nil {
+		return nil
 	}
-	if limit != nil && *limit > 0 && *limit <= 100 {
-		normalizedLimit = *limit
-	}
-	return normalizedPage, normalizedLimit
+	result := int(*i)
+	return &result
 }
 
-func ContainsIgnoreCase(str, substr string) bool {
-	str = NormalizeString(str)
-	substr = NormalizeString(substr)
-	return strings.Contains(str, substr)
+func FormatTimePtr(t *time.Time, layout string) *string {
+	if t == nil {
+		return nil
+	}
+	formatted := t.Format(layout)
+	return &formatted
 }
