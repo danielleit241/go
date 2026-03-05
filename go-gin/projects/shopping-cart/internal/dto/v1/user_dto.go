@@ -25,7 +25,7 @@ type UserCreateRequest struct {
 	Password string `json:"password" binding:"required,min=6,max=100"`
 	Age      *int   `json:"age" binding:"omitempty,gt=0"`
 	Status   int    `json:"status" binding:"required,oneof=0 1"`
-	Role     int    `json:"role" binding:"required,oneof=1 2"`
+	Role     int    `json:"role" binding:"required,oneof=0 1 2"`
 }
 
 type UserUpdateRequest struct {
@@ -34,7 +34,7 @@ type UserUpdateRequest struct {
 	Password string `json:"password" binding:"omitempty,min=6,max=100"`
 	Age      *int   `json:"age" binding:"omitempty,gt=0"`
 	Status   int    `json:"status" binding:"omitempty,oneof=0 1"`
-	Role     int    `json:"role" binding:"omitempty,oneof=1 2"`
+	Role     int    `json:"role" binding:"omitempty,oneof=0 1 2"`
 }
 
 func ToResponse(user sqlc.User) *UserResponse {

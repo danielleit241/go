@@ -10,21 +10,8 @@ import (
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (
-    name, 
-    email, 
-    password, 
-    age, 
-    status, 
-    role
-) VALUES (
-    $1,
-    $2,
-    $3,
-    $4,
-    $5,
-    $6
-) RETURNING id, name, age, email, password, status, role, created_at_utc, updated_at_utc, deleted_at_utc
+INSERT INTO users (name, email, password, age, status, role) 
+VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, name, age, email, password, status, role, created_at_utc, updated_at_utc, deleted_at_utc
 `
 
 type CreateUserParams struct {

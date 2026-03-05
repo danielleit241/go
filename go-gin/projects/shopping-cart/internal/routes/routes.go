@@ -5,7 +5,6 @@ import (
 	"github.com/danielleit241/internal/middleware"
 	"github.com/danielleit241/pkg/logger"
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog"
 )
 
 type Route interface {
@@ -13,9 +12,9 @@ type Route interface {
 }
 
 func RegisterRoutes(r *gin.Engine, conf *config.Config, routes ...Route) {
-	rateLimitLogger := newLoggerWithPath("internal/logs/ratelimit.log", "warn", conf.Environment)
-	httpLogger := newLoggerWithPath("internal/logs/http.log", "info", conf.Environment)
-	recoveryLogger := newLoggerWithPath("internal/logs/recovery.log", "error", conf.Environment)
+	rateLimitLogger := logger.NewWithPath("internal/logs/ratelimit.log", "warn", conf.Environment)
+	httpLogger := logger.NewWithPath("internal/logs/http.log", "info", conf.Environment)
+	recoveryLogger := logger.NewWithPath("internal/logs/recovery.log", "error", conf.Environment)
 
 	r.Use(
 		middleware.RateLimit(rateLimitLogger),
@@ -29,17 +28,4 @@ func RegisterRoutes(r *gin.Engine, conf *config.Config, routes ...Route) {
 	for _, route := range routes {
 		route.Register(apiGroup)
 	}
-}
-
-func newLoggerWithPath(logPath string, level string, env string) *zerolog.Logger {
-	config := logger.LoggerConfig{
-		FileName:    logPath,
-		MaxSize:     1,
-		MaxBackups:  5,
-		MaxAge:      5,
-		Compress:    true,
-		Level:       level,
-		Environment: env,
-	}
-	return logger.NewLogger(config)
 }

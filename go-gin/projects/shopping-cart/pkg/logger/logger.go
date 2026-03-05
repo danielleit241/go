@@ -22,6 +22,19 @@ type LoggerConfig struct {
 	Environment string
 }
 
+func NewWithPath(logPath string, level string, env string) *zerolog.Logger {
+	config := LoggerConfig{
+		FileName:    logPath,
+		MaxSize:     1,
+		MaxBackups:  5,
+		MaxAge:      5,
+		Compress:    true,
+		Level:       level,
+		Environment: env,
+	}
+	return NewLogger(config)
+}
+
 func NewLogger(config LoggerConfig) *zerolog.Logger {
 	if dir := filepath.Dir(config.FileName); dir != "." {
 		_ = os.MkdirAll(dir, 0o755)
