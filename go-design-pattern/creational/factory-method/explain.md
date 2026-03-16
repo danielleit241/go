@@ -1,6 +1,6 @@
 # Factory Method
 
-## 1) Định nghĩa
+## Định nghĩa
 
 **Factory Method** là mẫu thiết kế tạo đối tượng, trong đó việc khởi tạo object được đưa vào một hàm factory thay vì để client khởi tạo trực tiếp.
 
@@ -12,9 +12,9 @@
 
 ---
 
-## 2) Vấn đề trong ví dụ `problem`
+## Vấn đề
 
-Trong [creational/factory-method/problem/main.go](creational/factory-method/problem/main.go):
+Trong [go-design-pattern/creational/factory-method/problem/main.go](go-design-pattern/creational/factory-method/problem/main.go):
 
 - `NotificationService` phụ thuộc trực tiếp vào concrete type (`&EmailNotifier{}`)
 - User/client phải biết implementation cụ thể để khởi tạo
@@ -24,9 +24,9 @@ Trong [creational/factory-method/problem/main.go](creational/factory-method/prob
 
 ---
 
-## 3) Cách giải trong ví dụ `solution`
+## Giải quyết
 
-Trong [creational/factory-method/solution/main.go](creational/factory-method/solution/main.go):
+Trong [go-design-pattern/creational/factory-method/solution/main.go](go-design-pattern/creational/factory-method/solution/main.go):
 
 - Thêm factory method `CreateNotifier(notificationType string) Notifier`
 - Factory dùng `switch` để chọn và trả về notifier phù hợp
@@ -44,7 +44,7 @@ Như vậy client gọi factory để lấy `Notifier` thay vì tự `new` concr
 
 ---
 
-## 4) Tóm tắt
+## Tóm tắt
 
 Factory Method giúp bạn viết code theo hướng mở rộng tốt hơn:
 

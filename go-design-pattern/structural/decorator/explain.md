@@ -1,6 +1,6 @@
 # Decorator
 
-## 1) Định nghĩa
+## Định nghĩa
 
 **Decorator** là mẫu thiết kế cho phép thêm hành vi vào object một cách linh hoạt bằng cách bọc (wrap) object đó, thay vì sửa trực tiếp class/struct gốc.
 
@@ -14,9 +14,9 @@ Nhờ vậy có thể kết hợp tính năng theo từng nhu cầu mà không p
 
 ---
 
-## 2) Vấn đề trong ví dụ `problem`
+## Vấn đề
 
-Trong [structural/decorator/problem/main.go](structural/decorator/problem/main.go):
+Trong [go-design-pattern/structural/decorator/problem/main.go](go-design-pattern/structural/decorator/problem/main.go):
 
 - Khi muốn gửi qua nhiều kênh, phải tạo struct mới như `EmailSMSNotifier`
 - Nếu thêm tổ hợp mới (Email + SMS + Telegram), lại phải tạo thêm struct khác
@@ -26,9 +26,9 @@ Cách này dễ dẫn đến trùng lặp code và khó mở rộng.
 
 ---
 
-## 3) Cách giải trong ví dụ `solution`
+## Giải quyết
 
-Trong [structural/decorator/solution/main.go](structural/decorator/solution/main.go):
+Trong [go-design-pattern/structural/decorator/solution/main.go](go-design-pattern/structural/decorator/solution/main.go):
 
 - Tạo `NotifierDecorator` cũng implement `Notifier`
 - `NotifierDecorator` giữ `notifier` hiện tại và con trỏ `core` để chain nhiều lớp bọc
@@ -47,7 +47,7 @@ Kết quả: một lệnh gửi sẽ đi qua nhiều kênh mà không cần tạ
 
 ---
 
-## 4) Tóm tắt
+## Tóm tắt
 
 Decorator giúp mở rộng hành vi theo kiểu “xếp lớp”, không sửa code gốc và không tạo nhiều class/struct tổ hợp.
 

@@ -1,6 +1,6 @@
 # Chain of Responsibility
 
-## 1) Định nghĩa
+## Định nghĩa
 
 **Chain of Responsibility (CoR)** là mẫu thiết kế cho phép đưa một request đi qua một chuỗi handler. Mỗi handler xử lý một phần việc rồi chuyển tiếp cho handler kế tiếp.
 
@@ -12,9 +12,9 @@
 
 ---
 
-## 2) Vấn đề trong ví dụ `problem`
+## Vấn đề
 
-Trong [behavioral/chain-of-responsibility/problem/main.go](behavioral/chain-of-responsibility/problem/main.go):
+Trong [go-design-pattern/behavioral/chain-of-responsibility/problem/main.go](go-design-pattern/behavioral/chain-of-responsibility/problem/main.go):
 
 - Toàn bộ các bước crawl được viết cứng trong một hàm `Crawl`
 - Logic các bước bị dính chặt với nhau
@@ -24,9 +24,9 @@ Cách này phù hợp demo đơn giản, nhưng sẽ khó maintain khi pipeline 
 
 ---
 
-## 3) Cách giải trong ví dụ `solution`
+## Giải quyết
 
-Trong [behavioral/chain-of-responsibility/solution/main.go](behavioral/chain-of-responsibility/solution/main.go):
+Trong [go-design-pattern/behavioral/chain-of-responsibility/solution/main.go](go-design-pattern/behavioral/chain-of-responsibility/solution/main.go):
 
 - Mỗi bước được tách thành một `Handler` (`CheckingURL`, `FetchingContent`, `ExtractingLinks`, `SavingToDatabase`)
 - Dữ liệu dùng chung đi qua các bước thông qua `Context`
@@ -37,7 +37,7 @@ Trong [behavioral/chain-of-responsibility/solution/main.go](behavioral/chain-of-
 
 ---
 
-## 4) Tóm tắt
+## Tóm tắt
 
 CoR giúp biến một luồng xử lý dài thành pipeline gồm nhiều bước độc lập.
 
